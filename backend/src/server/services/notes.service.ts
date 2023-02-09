@@ -1,8 +1,8 @@
 /**
  * Data Model Interfaces
  */
-import { BaseNote, Note } from "./interface.note";
-import { Notes } from "./notes.interface";
+import { BaseNote, Note } from "../interfaces/interface.note";
+import { Notes } from "../interfaces/interface.notes";
 
 /**
  * In-Memory Store

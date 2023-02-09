@@ -5,7 +5,7 @@ import * as dotenv from "dotenv";
 import express from "express";
 import cors from "cors";
 import helmet from "helmet";
-import { notesRouter } from "./router.notes";
+import { notesRouter } from "./routers/router.notes";
 
 dotenv.config();
 

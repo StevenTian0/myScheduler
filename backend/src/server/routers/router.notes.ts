@@ -1,7 +1,7 @@
 
 import express, { Request, Response } from "express";
-import * as NoteService from "./notes.service";
-import { BaseNote, Note } from "./interface.note";
+import * as NoteService from "../services/notes.service";
+import { BaseNote, Note } from "../interfaces/interface.note";
 
 
 export const notesRouter = express.Router();
