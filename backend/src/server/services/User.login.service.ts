@@ -2,12 +2,12 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import User, { IUser } from "../models/User";
 
-interface LoginCredentials {
+interface ILoginCredentials {
   username: string;
   password: string;
 }
 
-export const loginService = async (credentials: LoginCredentials) => {
+export const loginService = async (credentials: ILoginCredentials) => {
   const { username, password } = credentials;
 
   // Find the user with the given username
