@@ -6,7 +6,7 @@ import express from "express";
 import cors from "cors";
 import helmet from "helmet";
 import mongoose from "mongoose";
-import { notesRouter } from "./routers/router.notes";
+import userRouter from "./routers/User.router";
 
 dotenv.config();
 
@@ -35,7 +35,7 @@ app.use(express.json());
 /**
  * Routes
  */
-app.use("/api/notes", notesRouter);
+app.use("/api/user/signUp", userRouter);
 
 /**
  * Connect to MongoDB
