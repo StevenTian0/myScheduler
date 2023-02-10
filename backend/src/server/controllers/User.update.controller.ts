@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
-import updateUser from "../services/User.update";
+import { updateUser } from "../services/User.update.service";
 
-const updateUserController = async (req: Request, res: Response) => {
+export const updateUserController = async (req: Request, res: Response) => {
   try {
     const { userId, newUsername, newPassword, token } = req.body;
     const result = await updateUser({
@@ -15,5 +15,3 @@ const updateUserController = async (req: Request, res: Response) => {
     res.status(400).json({ message: error.message });
   }
 };
-
-export default updateUserController;

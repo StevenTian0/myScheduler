@@ -9,7 +9,7 @@ interface IUpdateUserInput {
   token: string;
 }
 
-const updateUser = async ({
+export const updateUser = async ({
   userId,
   newUsername,
   newPassword,
@@ -59,5 +59,3 @@ const updateUser = async ({
     throw error;
   }
 };
-
-export default updateUser;
