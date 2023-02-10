@@ -2,7 +2,7 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import User, { IUser } from "../models/User";
 
-interface UpdateUserInput {
+interface IUpdateUserInput {
   userId: string;
   newUsername?: string;
   newPassword?: string;
@@ -14,7 +14,7 @@ const updateUser = async ({
   newUsername,
   newPassword,
   token,
-}: UpdateUserInput) => {
+}: IUpdateUserInput) => {
   try {
     // Verify the token to make sure the user is authenticated
     const decoded = jwt.verify(token, process.env.JWT_SECRET || "");
@@ -34,7 +34,7 @@ const updateUser = async ({
     }
 
     // Check if the new password is different from the old one
-    if (newPassword && await bcrypt.compare(newPassword, user.password)) {
+    if (newPassword && (await bcrypt.compare(newPassword, user.password))) {
       throw new Error("New password must be different from the old one");
     }
 
@@ -45,7 +45,7 @@ const updateUser = async ({
 
     // Update the password if a new one was provided
     if (newPassword) {
-      user.password = await bcrypt.hash(newPassword, 10);
+      user.password = newPassword;
     }
 
     // Save the user to the database
