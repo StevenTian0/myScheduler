@@ -7,7 +7,7 @@ export const signUpController = async (req: Request, res: Response) => {
     const { email, username, password } = req.body;
     const user = await signUp(email, username, password);
     return res.status(201).json({ message: "User created successfully", user });
-  } catch (error) {
+  } catch (error: any) {
     return res.status(400).json({ error: error.message });
   }
 };

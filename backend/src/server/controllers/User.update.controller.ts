@@ -11,7 +11,7 @@ const updateUserController = async (req: Request, res: Response) => {
       token,
     });
     res.status(200).json(result);
-  } catch (error) {
+  } catch (error: any) {
     res.status(400).json({ message: error.message });
   }
 };
