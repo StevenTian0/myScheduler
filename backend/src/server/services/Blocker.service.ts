@@ -49,3 +49,17 @@ export const addBlocker = async (
 		throw error
 	}
 }
+
+export const deleteBlocker = async (token: string, time: Date) => {
+	try {
+		const user = await fetchUser(token)
+		const blocker = await Blocker.findOne({ user: user._id, time: time })
+		if (!blocker) {
+			throw new Error("Blocker not found")
+		}
+		await blocker.remove()
+		return { message: "Blocker deleted successfully" }
+	} catch (error) {
+		throw error
+	}
+}
