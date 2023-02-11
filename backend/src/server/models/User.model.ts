@@ -1,16 +1,6 @@
 import mongoose, { Schema, Document } from "mongoose";
 import bcrypt from "bcryptjs";
 
-// Define the interface for the User document
-export interface IUser extends Document {
-  email: string;
-  username: string;
-  password: string;
-  uiColor: UiColor;
-  languagePref: LanguagePref;
-  score: number;
-}
-
 // Define the UI color enum type
 export enum UiColor {
   LIGHT = "light",
@@ -52,4 +42,4 @@ UserSchema.pre("save", async function (next) {
 });
 
 // Compile the User model from the UserSchema and export it
-export default mongoose.model<IUser>("User", UserSchema);
+export default mongoose.model("User", UserSchema);
