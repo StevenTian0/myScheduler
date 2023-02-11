@@ -12,8 +12,8 @@ interface IUpdateUserInput {
   token: string;
   newUsername?: string;
   newPassword?: string;
-  newUiColor?: UiColor;
-  newLanguagePref?: LanguagePref;
+  newUiColor?: string;
+  newLanguagePref?: string;
 }
 
 // Sign Up Service
@@ -128,16 +128,29 @@ export const updateUser = async ({
     }
 
     // Check if the new ui color is different from the old one
-    if (newUiColor && newUiColor === user.uiColor) {
+    if (newUiColor && getUiEnum(newUiColor) === user.uiColor) {
       throw new Error(
         "New ui color preference must be different from the old one"
       );
     }
 
     // Check if the new language preference is different from the old one
-    if (newLanguagePref && newLanguagePref === user.languagePref) {
+    if (
+      newLanguagePref &&
+      getLanguageEnum(newLanguagePref) === user.languagePref
+    ) {
       throw new Error(
         "New language preference must be different from the old one"
+      );
+    }
+
+    // Validate password
+    if (
+      newPassword &&
+      !/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{7,}$/.test(newPassword)
+    ) {
+      throw new Error(
+        "Password must be at least 7 characters long, contain one uppercase letter, one lowercase letter and one digit"
       );
     }
 
@@ -153,12 +166,12 @@ export const updateUser = async ({
 
     // Update the username if a new one was provided
     if (newUiColor) {
-      user.uiColor = newUiColor;
+      user.uiColor = getUiEnum(newUiColor);
     }
 
     // Update the password if a new one was provided
     if (newLanguagePref) {
-      user.languagePref = newLanguagePref;
+      user.languagePref = getLanguageEnum(newLanguagePref);
     }
 
     // Save the user to the database
@@ -172,3 +185,25 @@ export const updateUser = async ({
     throw error;
   }
 };
+
+function getUiEnum(value: string) {
+  switch (value) {
+    case "light":
+      return UiColor.LIGHT;
+    case "dark":
+      return UiColor.DARK;
+    default:
+      throw new Error("Invalid enum value");
+  }
+}
+
+function getLanguageEnum(value: string) {
+  switch (value) {
+    case "EN":
+      return LanguagePref.EN;
+    case "FR":
+      return LanguagePref.FR;
+    default:
+      throw new Error("Invalid enum value");
+  }
+}
