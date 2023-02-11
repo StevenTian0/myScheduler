@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import {
-  add, updateTask,
+  add, updateTask, deleteTask, getTask
 } from "../services/Task.service";
 
 export const addController = async (req: Request, res: Response) => {
@@ -35,3 +35,28 @@ export const updateController = async (req: Request, res: Response) => {
       res.status(400).json({ error: error.message });
     }
   };
+
+ export const deleteController = async (req: Request, res: Response) => {
+    try {
+        const { taskId } = req.body;
+        const result = await deleteTask(taskId);
+
+        res.status(200).json(result);
+    } catch (error: any) {
+        res.status(400).json({ error: error.message });
+    }
+ };
+
+export const getController = async (req: Request, res: Response) => {
+  try {
+
+    const { taskId } = req.body;
+
+    const task = await getTask(taskId);
+
+    res.status(200).json(task);
+  } catch (error: any) {
+    res.status(400).json({ error: error.message });
+  }
+};
+

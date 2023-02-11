@@ -21,6 +21,44 @@ export const add = async (
     return task.save();
 };
 
+export async function getTask(taskId: string) {
+  try {
+
+    const task = await Task.findById(taskId);
+
+    if (!task) {
+      throw new Error("Task not found");
+    }
+
+  return {
+    message: "Task: ",
+    task,
+    };
+  } catch (error) {
+    throw error;
+  }
+};
+
+
+export async function deleteTask(taskId: string) {
+  try {
+
+    const task = await Task.findById(taskId);
+
+    if (!task) {
+      throw new Error("Task not found");
+    }
+
+    await task.remove();
+
+    return {
+      message: "Task deleted successfully",
+    };
+  } catch (error) {
+    throw error;
+  }
+}
+
 interface IUpdateTaskInput {
     taskId: string;
     newDueDate?: Date;
@@ -93,9 +131,9 @@ export const updateTask = async ({
       await task.save();
   
       return {
-        message: "Task updated successfully",
-        task,
-      };
+           message: "Task updated successfully",
+           task,
+         };
     } catch (error) {
       throw error;
     }
