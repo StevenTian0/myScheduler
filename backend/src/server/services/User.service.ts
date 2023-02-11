@@ -112,6 +112,16 @@ export const loginService = async (credentials: ILoginCredentials) => {
   return { user, token };
 };
 
+export const getUserScore = async (token:string) =>{
+  try{
+    const user = await fetchUser(token);
+    let score = user.score
+    return score
+  }catch(error){
+    throw error;
+  }
+}
+
 export const deleteAccount = async (token: string) => {
   try {
     const user = await fetchUser(token);

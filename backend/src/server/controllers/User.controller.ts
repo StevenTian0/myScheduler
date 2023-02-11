@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import {
   deleteAccount,
+  getUserScore,
   loginService,
   signUp,
   toggleColor,
@@ -43,6 +44,16 @@ export const signUpController = async (req: Request, res: Response) => {
     res.status(400).json({ error: error.message });
   }
 };
+
+export const getUserScoreController = async (req: Request, res:Response) => {
+  try {
+    const {token} = req.body;
+    const score = await getUserScore(token);
+    res.status(201).json({ message: "Score get successfully", score });
+  } catch (error: any) {
+    res.status(400).json({ error: error.message });
+  }
+}
 
 export const updateUserController = async (req: Request, res: Response) => {
   try {
