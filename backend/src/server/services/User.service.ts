@@ -36,9 +36,8 @@ export const signUp = async (
 export async function deleteAccount(token: string) {
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-
     // Find the user in the database using the decoded id from the token
-    const user = await User.findById(decoded._id);
+    const user = await User.findById(decoded.userId);
 
     // If no user is found, throw an error
     if (!user) {
@@ -80,6 +79,7 @@ export const loginService = async (credentials: ILoginCredentials) => {
     throw new Error("Password is incorrect");
   }
 
+  console.log(process.env.JWT_SECRET);
   // If the username and password are both correct, return the user object and a JWT
   const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, {
     expiresIn: "1d",

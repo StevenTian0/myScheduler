@@ -35,7 +35,7 @@ app.use(express.json());
 /**
  * Routes
  */
-app.use("/api/user/signUp", userRouter);
+app.use(userRouter);
 
 /**
  * Connect to MongoDB
@@ -49,7 +49,6 @@ mongoose.connect(MONGODB_URI, (error) => {
 
   console.log("Connected to MongoDB");
 });
-const db = mongoose.connection;
 
 /**
  * Start Server

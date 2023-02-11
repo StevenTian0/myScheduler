@@ -33,22 +33,13 @@ const UserSchema: Schema = new Schema({
   score: { type: Number, default: 0 }, // score is an optional number field, defaulting to 0
 });
 
+UserSchema.pre("save", async function (next) {
+  const rounds = 10; // What you want number for round paasword
+
+  const hash = await bcrypt.hash(this.password, rounds);
+  this.password = hash;
+  next();
+});
+
 // Compile the User model from the UserSchema and export it
 export default mongoose.model<IUser>("User", UserSchema);
-
-// Hash the password before saving the user to the database
-UserSchema.pre("save", function (next) {
-  const user = this;
-
-  // Only hash the password if it has been modified (or is new)
-  if (!user.isModified("password")) return next();
-
-  // Hash the password using salt
-  bcrypt.hash(user.password, 10, function (err, hash) {
-    if (err) return next(err);
-
-    // Overwrite the plain text password with the hashed password
-    user.password = hash;
-    next();
-  });
-});
