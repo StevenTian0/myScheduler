@@ -1,163 +1,151 @@
-import Task from "../models/Task.model";
-import {
-    userService,
-} from "../services/User.service";
+import Task from "../models/Task.model"
+import { fetchUser } from "../services/User.service"
 
-export const add = async (
-  dueDate: Date,
-  lengthOfWork: number,
-  name: string,
-  description: string,
-  user: string
+export const addTask = async (
+	dueDate: Date,
+	lengthOfWork: number,
+	user: string,
+	name?: string,
+	description?: string
 ) => {
-    
-    // Validate dueDate
-    var now = new Date();
-    if (dueDate<now) {
-        throw new Error("Invalid due date");
-    }
+	// Validate dueDate
+	var now = new Date()
+	if (dueDate < now) {
+		throw new Error("Invalid due date")
+	}
 
-    //do we need to validate user? is user the email?
-    
-    // Create the new task
-    const task = new Task({ dueDate, lengthOfWork, name, description, user});
-    return task.save();
-};
+	//do we need to validate user? is user the email?
+
+	// Create the new task
+	const task = new Task({ dueDate, lengthOfWork, name, description, user })
+	return task.save()
+}
 
 export async function getTask(taskId: string) {
-  try {
+	try {
+		const task = await Task.findById(taskId)
 
-    const task = await Task.findById(taskId);
+		if (!task) {
+			throw new Error("Task not found")
+		}
 
-    if (!task) {
-      throw new Error("Task not found");
-    }
+		return {
+			message: "Task: ",
+			task,
+		}
+	} catch (error) {
+		throw error
+	}
+}
 
-  return {
-    message: "Task: ",
-    task,
-    };
-  } catch (error) {
-    throw error;
-  }
-};
+export async function getAllTasks(token: string) {
+	try {
+		const user = await fetchUser(token)
+		const tasks = await Task.find({ user: user._id })
 
-export async function getAllTasks(token: String) {
-  try {
-
-    const user = await fetchUser(token)
-    const tasks = await Task.find({ user: user._id })
-
-    if (!tasks) {
-          throw new Error("Tasks not found");
-        }
-    }
-
-  return {
-    message: "Tasks: ",
-    tasks,
-    };
-  } catch (error) {
-    throw error;
-  }
-};
-
+		if (!tasks) {
+			throw new Error("Tasks not found")
+		}
+		return {
+			message: "Tasks retrieved successfully",
+			tasks,
+		}
+	} catch (error) {
+		throw error
+	}
+}
 
 export async function deleteTask(taskId: string) {
-  try {
+	try {
+		const task = await Task.findById(taskId)
 
-    const task = await Task.findById(taskId);
+		if (!task) {
+			throw new Error("Task not found")
+		}
 
-    if (!task) {
-      throw new Error("Task not found");
-    }
+		await task.remove()
 
-    await task.remove();
-
-    return {
-      message: "Task deleted successfully",
-    };
-  } catch (error) {
-    throw error;
-  }
+		return {
+			message: "Task deleted successfully",
+		}
+	} catch (error) {
+		throw error
+	}
 }
 
 interface IUpdateTaskInput {
-    taskId: string;
-    newDueDate?: Date;
-    newLengthOfWork?: number;
-    newName?: string;
-    newDescription?: string;
-    workDone?: number;
-  }
+	taskId: string
+	newDueDate?: Date
+	newLengthOfWork?: number
+	newName?: string
+	newDescription?: string
+	workDone?: number
+}
 
 export const updateTask = async ({
-    taskId,
-    newDueDate,
-    newLengthOfWork,
-    newName,
-    newDescription,
-    workDone,
-  }: IUpdateTaskInput) => {
-    try {
-  
-      // Find the task in the database
-      const task = await Task.findById(taskId);
-      if (!task) {
-        throw new Error("Task not found");
-      }
-  
-      //make sure new values are different from prev
-      if (newDueDate && newDueDate === task.dueDate) {
-        throw new Error("New due date must be different from the old one");
-      }
-      if (newLengthOfWork && newLengthOfWork === task.lengthOfWork) {
-        throw new Error("New length must be different from the old one");
-      }
-      if (newName && newName === task.name) {
-        throw new Error("New name must be different from the old one");
-      }
-      if (newDescription && newDescription === task.description) {
-        throw new Error("New description must be different from the old one");
-      }
+	taskId,
+	newDueDate,
+	newLengthOfWork,
+	newName,
+	newDescription,
+	workDone,
+}: IUpdateTaskInput) => {
+	try {
+		// Find the task in the database
+		const task = await Task.findById(taskId)
+		if (!task) {
+			throw new Error("Task not found")
+		}
 
-      //updating info
-      if (newDueDate) {
-        task.dueDate = newDueDate;
-      }
-      if (newLengthOfWork) {
-        task.lengthOfWork = newLengthOfWork;
-      }
-      if (newName) {
-        task.name = newName;
-      }
-      if (newDescription) {
-        task.description = newDescription;
-      }
+		//make sure new values are different from prev
+		if (newDueDate && newDueDate === task.dueDate) {
+			throw new Error("New due date must be different from the old one")
+		}
+		if (newLengthOfWork && newLengthOfWork === task.lengthOfWork) {
+			throw new Error("New length must be different from the old one")
+		}
+		if (newName && newName === task.name) {
+			throw new Error("New name must be different from the old one")
+		}
+		if (newDescription && newDescription === task.description) {
+			throw new Error("New description must be different from the old one")
+		}
 
-      //adding work done
-      if (workDone) {
-        if (workDone<0) {
-            throw new Error("Task progress cannot be negative");
-          }
-          else {
-            task.workDoneSoFar = task.workDoneSoFar + workDone;
-            // should priority be done? or should we have a status for complete tasks, or should be just delete it once done
-            //maybe not delete since we're making a performance report
-            if (task.workDoneSoFar==length) {
+		//updating info
+		if (newDueDate) {
+			task.dueDate = newDueDate
+		}
+		if (newLengthOfWork) {
+			task.lengthOfWork = newLengthOfWork
+		}
+		if (newName) {
+			task.name = newName
+		}
+		if (newDescription) {
+			task.description = newDescription
+		}
 
-            }
-          }
-      }
-  
-      // Save task to the database
-      await task.save();
-  
-      return {
-           message: "Task updated successfully",
-           task,
-         };
-    } catch (error) {
-      throw error;
-    }
-  };
+		//adding work done
+		if (workDone) {
+			if (workDone < 0) {
+				throw new Error("Task progress cannot be negative")
+			} else {
+				task.workDoneSoFar = task.workDoneSoFar + workDone
+				// should priority be done? or should we have a status for complete tasks, or should be just delete it once done
+				//maybe not delete since we're making a performance report
+				if (task.workDoneSoFar == length) {
+				}
+			}
+		}
+
+		// Save task to the database
+		await task.save()
+
+		return {
+			message: "Task updated successfully",
+			task,
+		}
+	} catch (error) {
+		throw error
+	}
+}

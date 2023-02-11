@@ -38,7 +38,7 @@ function getLanguageEnum(value: string) {
 	}
 }
 
-const fetchUser = async (token: string) => {
+export const fetchUser = async (token: string) => {
 	try {
 		const decoded = jwt.verify(token, process.env.JWT_SECRET)
 		// Find the user in the database using the decoded id from the token
