@@ -1,4 +1,7 @@
 import Task from "../models/Task.model";
+import {
+    userService,
+} from "../services/User.service";
 
 export const add = async (
   dueDate: Date,
@@ -33,6 +36,26 @@ export async function getTask(taskId: string) {
   return {
     message: "Task: ",
     task,
+    };
+  } catch (error) {
+    throw error;
+  }
+};
+
+export async function getAllTasks(token: String) {
+  try {
+
+    const user = await fetchUser(token)
+    const tasks = await Task.find({ user: user._id })
+
+    if (!tasks) {
+          throw new Error("Tasks not found");
+        }
+    }
+
+  return {
+    message: "Tasks: ",
+    tasks,
     };
   } catch (error) {
     throw error;
