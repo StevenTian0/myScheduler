@@ -1,13 +1,6 @@
 import mongoose, { Schema, Document } from "mongoose"
 
 // Define the interface for the Blocker model
-export interface IBlocker extends Document {
-	startTime: Date
-	duration: number
-	name: string
-	description: string
-	user: string
-}
 
 // Define the Mongoose schema for the Blocker document
 const BlockerSchema: Schema = new Schema({
@@ -19,4 +12,4 @@ const BlockerSchema: Schema = new Schema({
 })
 
 // Export the Blocker model using Mongoose's model method
-export default mongoose.model<IBlocker>("Blocker", BlockerSchema)
+export default mongoose.model("Blocker", BlockerSchema)
