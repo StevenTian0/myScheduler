@@ -16,6 +16,28 @@ interface IUpdateUserInput {
   newLanguagePref?: string;
 }
 
+function getUiEnum(value: string) {
+  switch (value) {
+    case "light":
+      return UiColor.LIGHT;
+    case "dark":
+      return UiColor.DARK;
+    default:
+      throw new Error("Invalid enum value");
+  }
+}
+
+function getLanguageEnum(value: string) {
+  switch (value) {
+    case "EN":
+      return LanguagePref.EN;
+    case "FR":
+      return LanguagePref.FR;
+    default:
+      throw new Error("Invalid enum value");
+  }
+}
+
 // Sign Up Service
 export const signUp = async (
   email: string,
@@ -87,8 +109,6 @@ export const loginService = async (credentials: ILoginCredentials) => {
   if (!isPasswordCorrect) {
     throw new Error("Password is incorrect");
   }
-
-  console.log(process.env.JWT_SECRET);
   // If the username and password are both correct, return the user object and a JWT
   const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, {
     expiresIn: "1d",
@@ -99,12 +119,16 @@ export const loginService = async (credentials: ILoginCredentials) => {
 
 export const updateUser = async ({
   token,
-  newUsername,
-  newPassword,
-  newUiColor,
-  newLanguagePref,
+  newUsername = undefined,
+  newPassword = undefined,
+  newUiColor = undefined,
+  newLanguagePref = undefined,
 }: IUpdateUserInput) => {
   try {
+    console.log(newUsername);
+    console.log(newPassword);
+    console.log(newUiColor);
+    console.log(newLanguagePref);
     // Verify the token to make sure the user is authenticated
     const decoded = jwt.verify(token, process.env.JWT_SECRET || "");
     if (!decoded) {
@@ -185,25 +209,3 @@ export const updateUser = async ({
     throw error;
   }
 };
-
-function getUiEnum(value: string) {
-  switch (value) {
-    case "light":
-      return UiColor.LIGHT;
-    case "dark":
-      return UiColor.DARK;
-    default:
-      throw new Error("Invalid enum value");
-  }
-}
-
-function getLanguageEnum(value: string) {
-  switch (value) {
-    case "EN":
-      return LanguagePref.EN;
-    case "FR":
-      return LanguagePref.FR;
-    default:
-      throw new Error("Invalid enum value");
-  }
-}

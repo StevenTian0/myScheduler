@@ -41,12 +41,14 @@ export const signUpController = async (req: Request, res: Response) => {
 
 export const updateUserController = async (req: Request, res: Response) => {
   try {
-    const { userId, newUsername, newPassword, token } = req.body;
+    const { newUsername, newPassword, token, newUiColor, newLanguagePref } =
+      req.body;
     const result = await updateUser({
-      userId,
       newUsername,
       newPassword,
       token,
+      newUiColor,
+      newLanguagePref,
     });
     res.status(200).json(result);
   } catch (error: any) {
