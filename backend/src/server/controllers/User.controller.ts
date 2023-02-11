@@ -3,6 +3,7 @@ import {
   deleteAccount,
   loginService,
   signUp,
+  toggleColor,
   updateUser,
 } from "../services/User.service";
 
@@ -50,6 +51,19 @@ export const updateUserController = async (req: Request, res: Response) => {
       newUiColor,
       newLanguagePref,
     });
+    res.status(200).json(result);
+  } catch (error: any) {
+    res.status(400).json({ message: error.message });
+  }
+};
+
+export const toggleColorUserController = async (
+  req: Request,
+  res: Response
+) => {
+  try {
+    const { token } = req.body;
+    const result = await toggleColor(token);
     res.status(200).json(result);
   } catch (error: any) {
     res.status(400).json({ message: error.message });

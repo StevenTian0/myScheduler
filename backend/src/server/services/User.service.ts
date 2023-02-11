@@ -38,6 +38,23 @@ function getLanguageEnum(value: string) {
   }
 }
 
+const fetchUser = async (token: string) => {
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    // Find the user in the database using the decoded id from the token
+    const user = await User.findById(decoded.userId);
+
+    // If no user is found, throw an error
+    if (!user) {
+      throw new Error("User not found");
+    }
+
+    return user;
+  } catch (error) {
+    throw error;
+  }
+};
+
 // Sign Up Service
 export const signUp = async (
   email: string,
@@ -69,28 +86,6 @@ export const signUp = async (
   return user.save();
 };
 
-export async function deleteAccount(token: string) {
-  try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    // Find the user in the database using the decoded id from the token
-    const user = await User.findById(decoded.userId);
-
-    // If no user is found, throw an error
-    if (!user) {
-      throw new Error("User not found");
-    }
-
-    // Remove the user from the database
-    await user.remove();
-
-    return {
-      message: `Account under email ${user.email} deleted successfully`,
-    };
-  } catch (error) {
-    throw error;
-  }
-}
-
 export const loginService = async (credentials: ILoginCredentials) => {
   const { username, password } = credentials;
 
@@ -117,29 +112,30 @@ export const loginService = async (credentials: ILoginCredentials) => {
   return { user, token };
 };
 
+export const deleteAccount = async (token: string) => {
+  try {
+    const user = await fetchUser(token);
+
+    // Remove the user from the database
+    await user.remove();
+
+    return {
+      message: `Account under email ${user.email} deleted successfully`,
+    };
+  } catch (error) {
+    throw error;
+  }
+};
+
 export const updateUser = async ({
   token,
-  newUsername = undefined,
-  newPassword = undefined,
-  newUiColor = undefined,
-  newLanguagePref = undefined,
+  newUsername,
+  newPassword,
+  newUiColor,
+  newLanguagePref,
 }: IUpdateUserInput) => {
   try {
-    console.log(newUsername);
-    console.log(newPassword);
-    console.log(newUiColor);
-    console.log(newLanguagePref);
-    // Verify the token to make sure the user is authenticated
-    const decoded = jwt.verify(token, process.env.JWT_SECRET || "");
-    if (!decoded) {
-      throw new Error("Invalid token");
-    }
-
-    // Find the user in the database
-    const user = await User.findById(decoded.userId);
-    if (!user) {
-      throw new Error("User not found");
-    }
+    var user = await fetchUser(token);
 
     // // Check if the new username is different from the old one
     // if (newUsername && newUsername === user.username) {
@@ -205,6 +201,20 @@ export const updateUser = async ({
       message: "User updated successfully",
       user,
     };
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const toggleColor = async (token: string) => {
+  try {
+    var user = await fetchUser(token);
+
+    if (user.uiColor === UiColor.LIGHT) {
+      user.uiColor = UiColor.DARK;
+    } else {
+      user.uiColor = UiColor.LIGHT;
+    }
   } catch (error) {
     throw error;
   }
