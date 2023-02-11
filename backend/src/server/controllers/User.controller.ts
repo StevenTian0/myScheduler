@@ -23,6 +23,10 @@ export const loginController = async (req: Request, res: Response) => {
     const { username, password } = req.body;
     const { user, token } = await loginService({ username, password });
 
+    res.cookie("token", token, {
+      expires: new Date(Date.now() + 24 * 60 * 60 * 1000), // expires in 24 hours
+      httpOnly: true,
+    });
     res.status(200).json({ user, token });
   } catch (error: any) {
     res.status(400).json({ error: error.message });
