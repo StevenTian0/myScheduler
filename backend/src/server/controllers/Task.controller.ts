@@ -63,7 +63,8 @@ export const getController = async (req: Request, res: Response) => {
 export const getAllController = async (req: Request, res: Response) => {
   try {
 
-    const tasks = await getAllTasks();
+    const { token } = req.body;
+    const tasks = await getAllTasks(token);
 
     res.status(200).json(tasks);
   } catch (error: any) {
