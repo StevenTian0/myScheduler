@@ -1,7 +1,5 @@
 import mongoose, { Schema, Document } from "mongoose"
 
-// Define the interface for the Blocker model
-
 // Define the Mongoose schema for the Blocker document
 const BlockerSchema: Schema = new Schema({
 	time: { type: Date, required: true },
