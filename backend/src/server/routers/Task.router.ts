@@ -12,7 +12,7 @@ const taskRouter = Router();
 taskRouter.post("/api/task/add", addController);
 taskRouter.patch("/api/task/update", updateController);
 taskRouter.delete("/api/task/delete", deleteController);
-taskRouter.get("/api/task/get", getController);
-taskRouter.get("/api/task/get", getAllController);
+taskRouter.get("/api/task/getATask", getController);
+taskRouter.get("/api/task/getAllTasks", getAllController);
 
 export default taskRouter;
