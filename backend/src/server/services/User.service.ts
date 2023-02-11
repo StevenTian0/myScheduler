@@ -1,6 +1,20 @@
 import jwt from "jsonwebtoken";
 import User from "../models/User.model";
+import { UiColor, LanguagePref } from "../models/User.model";
 import bcrypt from "bcryptjs";
+
+interface ILoginCredentials {
+  username: string;
+  password: string;
+}
+
+interface IUpdateUserInput {
+  token: string;
+  newUsername?: string;
+  newPassword?: string;
+  newUiColor?: UiColor;
+  newLanguagePref?: LanguagePref;
+}
 
 // Sign Up Service
 export const signUp = async (
@@ -48,16 +62,11 @@ export async function deleteAccount(token: string) {
     await user.remove();
 
     return {
-      message: "User account deleted successfully",
+      message: `Account under email ${user.email} deleted successfully`,
     };
   } catch (error) {
     throw error;
   }
-}
-
-interface ILoginCredentials {
-  username: string;
-  password: string;
 }
 
 export const loginService = async (credentials: ILoginCredentials) => {
@@ -88,18 +97,12 @@ export const loginService = async (credentials: ILoginCredentials) => {
   return { user, token };
 };
 
-interface IUpdateUserInput {
-  userId: string;
-  newUsername?: string;
-  newPassword?: string;
-  token: string;
-}
-
 export const updateUser = async ({
-  userId,
+  token,
   newUsername,
   newPassword,
-  token,
+  newUiColor,
+  newLanguagePref,
 }: IUpdateUserInput) => {
   try {
     // Verify the token to make sure the user is authenticated
@@ -109,7 +112,7 @@ export const updateUser = async ({
     }
 
     // Find the user in the database
-    const user = await User.findById(userId);
+    const user = await User.findById(decoded.userId);
     if (!user) {
       throw new Error("User not found");
     }
@@ -124,6 +127,20 @@ export const updateUser = async ({
       throw new Error("New password must be different from the old one");
     }
 
+    // Check if the new ui color is different from the old one
+    if (newUiColor && newUiColor === user.uiColor) {
+      throw new Error(
+        "New ui color preference must be different from the old one"
+      );
+    }
+
+    // Check if the new language preference is different from the old one
+    if (newLanguagePref && newLanguagePref === user.languagePref) {
+      throw new Error(
+        "New language preference must be different from the old one"
+      );
+    }
+
     // Update the username if a new one was provided
     if (newUsername) {
       user.username = newUsername;
@@ -132,6 +149,16 @@ export const updateUser = async ({
     // Update the password if a new one was provided
     if (newPassword) {
       user.password = newPassword;
+    }
+
+    // Update the username if a new one was provided
+    if (newUiColor) {
+      user.uiColor = newUiColor;
+    }
+
+    // Update the password if a new one was provided
+    if (newLanguagePref) {
+      user.languagePref = newLanguagePref;
     }
 
     // Save the user to the database
