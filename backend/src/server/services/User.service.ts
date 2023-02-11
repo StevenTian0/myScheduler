@@ -141,32 +141,32 @@ export const updateUser = async ({
       throw new Error("User not found");
     }
 
-    // Check if the new username is different from the old one
-    if (newUsername && newUsername === user.username) {
-      throw new Error("New username must be different from the old one");
-    }
+    // // Check if the new username is different from the old one
+    // if (newUsername && newUsername === user.username) {
+    //   throw new Error("New username must be different from the old one");
+    // }
 
-    // Check if the new password is different from the old one
-    if (newPassword && (await bcrypt.compare(newPassword, user.password))) {
-      throw new Error("New password must be different from the old one");
-    }
+    // // Check if the new password is different from the old one
+    // if (newPassword && (await bcrypt.compare(newPassword, user.password))) {
+    //   throw new Error("New password must be different from the old one");
+    // }
 
-    // Check if the new ui color is different from the old one
-    if (newUiColor && getUiEnum(newUiColor) === user.uiColor) {
-      throw new Error(
-        "New ui color preference must be different from the old one"
-      );
-    }
+    // // Check if the new ui color is different from the old one
+    // if (newUiColor && getUiEnum(newUiColor) === user.uiColor) {
+    //   throw new Error(
+    //     "New ui color preference must be different from the old one"
+    //   );
+    // }
 
-    // Check if the new language preference is different from the old one
-    if (
-      newLanguagePref &&
-      getLanguageEnum(newLanguagePref) === user.languagePref
-    ) {
-      throw new Error(
-        "New language preference must be different from the old one"
-      );
-    }
+    // // Check if the new language preference is different from the old one
+    // if (
+    //   newLanguagePref &&
+    //   getLanguageEnum(newLanguagePref) === user.languagePref
+    // ) {
+    //   throw new Error(
+    //     "New language preference must be different from the old one"
+    //   );
+    // }
 
     // Validate password
     if (
