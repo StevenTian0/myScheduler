@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import {
-  add,
+  add, updateTask,
 } from "../services/Task.service";
 
 export const addController = async (req: Request, res: Response) => {
@@ -9,8 +9,6 @@ export const addController = async (req: Request, res: Response) => {
     const dueDate = new Date(req.body.dueDate);
     const lengthOfWork = Number(req.body.lengthOfWork);
     const {name, description, user} = req.body;
-    console.log(dueDate);
-    console.log(lengthOfWork);
 
     const task = await add(dueDate, lengthOfWork, name, description, user);
 
@@ -19,3 +17,21 @@ export const addController = async (req: Request, res: Response) => {
     res.status(400).json({ error: error.message });
   }
 };
+
+export const updateController = async (req: Request, res: Response) => {
+    try {
+        const {taskId, newDueDate, newLengthOfWork, newName, newDescription, workDone,} = req.body;
+  
+        const task = await updateTask({
+            taskId,
+            newDueDate,
+            newLengthOfWork,
+            newName,
+            newDescription,
+            workDone});
+    
+        res.status(201).json({ message: "Task updated successfully", task });
+    } catch (error: any) {
+      res.status(400).json({ error: error.message });
+    }
+  };
