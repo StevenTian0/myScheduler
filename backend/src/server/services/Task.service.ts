@@ -34,6 +34,7 @@ const getCategoryEnum = (value: String) => {
 }
 
 export const addTask = async (
+	_id: string,
 	dueDate: Date,
 	lengthOfWork: number,
 	priorityValue: string,
@@ -55,7 +56,9 @@ export const addTask = async (
 
 	// Create the new task
 	const task = new Task({
+		_id,
 		dueDate,
+		priority,
 		lengthOfWork,
 		name,
 		description,
@@ -65,16 +68,16 @@ export const addTask = async (
 	return task.save()
 }
 
-export const getTask = async (taskId: string) => {
+export const getTask = async (_id: string) => {
 	try {
-		const task = await Task.findById(taskId)
+		const task = await Task.findById(_id)
 
 		if (!task) {
 			throw new Error("Task not found")
 		}
 
 		return {
-			message: "Task: ",
+			message: `Task with ID ${_id} retrived successfully.`,
 			task,
 		}
 	} catch (error) {
@@ -99,9 +102,9 @@ export async function getAllTasks(token: string) {
 	}
 }
 
-export async function deleteTask(taskId: string) {
+export async function deleteTask(_id: string) {
 	try {
-		const task = await Task.findById(taskId)
+		const task = await Task.findById(_id)
 
 		if (!task) {
 			throw new Error("Task not found")
@@ -118,7 +121,7 @@ export async function deleteTask(taskId: string) {
 }
 
 interface IUpdateTaskInput {
-	taskId: string
+	_id: string
 	newDueDate?: Date
 	newLengthOfWork?: number
 	newName?: string
@@ -127,7 +130,7 @@ interface IUpdateTaskInput {
 }
 
 export const updateTask = async ({
-	taskId,
+	_id,
 	newDueDate,
 	newLengthOfWork,
 	newName,
@@ -136,7 +139,7 @@ export const updateTask = async ({
 }: IUpdateTaskInput) => {
 	try {
 		// Find the task in the database
-		const task = await Task.findById(taskId)
+		const task = await Task.findById(_id)
 		if (!task) {
 			throw new Error("Task not found")
 		}

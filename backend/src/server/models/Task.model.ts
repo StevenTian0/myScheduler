@@ -28,7 +28,7 @@ const TaskSchema: Schema = new Schema({
 	description: { type: String }, // The description of the task is optional
 	category: {
 		type: String,
-		enum: Object.values(Priority),
+		enum: Object.values(Category),
 		required: true,
 	}, // The category of the task is optional and defaults to 'Unassigned'
 	user: { type: mongoose.Types.ObjectId, ref: "User" }, // The user who created the task is a reference to the User model

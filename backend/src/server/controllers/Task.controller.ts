@@ -9,11 +9,27 @@ import {
 
 export const addController = async (req: Request, res: Response) => {
 	try {
-		const dueDate = new Date(req.body.dueDate)
-		const lengthOfWork = Number(req.body.lengthOfWork)
-		const { name, description, user } = req.body
+		const {
+			_id,
+			dueDate,
+			lengthOfWork,
+			priorityValue,
+			token,
+			categoryValue,
+			name,
+			description,
+		} = req.body
 
-		const task = await addTask(dueDate, lengthOfWork, name, description, user)
+		const task = await addTask(
+			_id,
+			dueDate,
+			lengthOfWork,
+			priorityValue,
+			token,
+			categoryValue,
+			name,
+			description
+		)
 
 		res.status(201).json({ message: "Task created successfully", task })
 	} catch (error: any) {
@@ -24,7 +40,7 @@ export const addController = async (req: Request, res: Response) => {
 export const updateController = async (req: Request, res: Response) => {
 	try {
 		const {
-			taskId,
+			_id,
 			newDueDate,
 			newLengthOfWork,
 			newName,
@@ -33,7 +49,7 @@ export const updateController = async (req: Request, res: Response) => {
 		} = req.body
 
 		const task = await updateTask({
-			taskId,
+			_id,
 			newDueDate,
 			newLengthOfWork,
 			newName,
@@ -49,8 +65,8 @@ export const updateController = async (req: Request, res: Response) => {
 
 export const deleteController = async (req: Request, res: Response) => {
 	try {
-		const { taskId } = req.body
-		const result = await deleteTask(taskId)
+		const { _id } = req.body
+		const result = await deleteTask(_id)
 
 		res.status(200).json(result)
 	} catch (error: any) {
@@ -60,9 +76,9 @@ export const deleteController = async (req: Request, res: Response) => {
 
 export const getController = async (req: Request, res: Response) => {
 	try {
-		const { taskId } = req.body
+		const { _id } = req.body
 
-		const task = await getTask(taskId)
+		const task = await getTask(_id)
 
 		res.status(200).json(task)
 	} catch (error: any) {
