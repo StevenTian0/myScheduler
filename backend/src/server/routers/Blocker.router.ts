@@ -5,6 +5,7 @@ import {
 	getAllBlockersController,
 	updateBlockerTimeController,
 	updateBlockerDurationController,
+	updateBlockerNameAndDescriptionController,
 } from "../controllers/Blocker.controller"
 
 const blockerRouter = Router()
@@ -16,6 +17,10 @@ blockerRouter.patch("/api/blockers/updateTime", updateBlockerTimeController)
 blockerRouter.patch(
 	"/api/blockers/updateDuration",
 	updateBlockerDurationController
+)
+blockerRouter.patch(
+	"/api/blockers/updateNameAndDescription",
+	updateBlockerNameAndDescriptionController
 )
 
 export default blockerRouter

@@ -6,6 +6,7 @@ import {
 	getAllBlockers,
 	updateBlockerDuration,
 	updateBlockerTime,
+	updateBlockerNameAndDescription,
 } from "../services/Blocker.service"
 
 export const addBlockerController = async (req: Request, res: Response) => {
@@ -65,6 +66,24 @@ export const updateBlockerDurationController = async (
 			token,
 			new Date(time),
 			newDuration
+		)
+		res.status(200).json(result)
+	} catch (error: any) {
+		res.status(400).json({ error: error.message })
+	}
+}
+
+export const updateBlockerNameAndDescriptionController = async (
+	req: Request,
+	res: Response
+) => {
+	try {
+		const { token, time, name, description } = req.body
+		const result = await updateBlockerNameAndDescription(
+			token,
+			new Date(time),
+			name,
+			description
 		)
 		res.status(200).json(result)
 	} catch (error: any) {

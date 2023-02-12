@@ -191,3 +191,42 @@ const checkConflict = (
 		throw error
 	}
 }
+
+export async function updateBlockerNameAndDescription(
+	token: string,
+	time: Date,
+	name?: string,
+	description?: string
+) {
+	try {
+		const user = await fetchUser(token)
+		if (!user) {
+			throw new Error("User not found")
+		}
+
+		const existingBlocker = await Blocker.findOne({
+			user: user._id,
+			time: time,
+		})
+		if (!existingBlocker) {
+			throw new Error("Blocker not found")
+		}
+
+		if (name) {
+			existingBlocker.name = name
+		}
+
+		if (description) {
+			existingBlocker.description = description
+		}
+
+		existingBlocker.save()
+
+		return {
+			message: "Blocker name and description updated successfully",
+			existingBlocker,
+		}
+	} catch (error) {
+		throw error
+	}
+}
