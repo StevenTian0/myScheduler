@@ -1,10 +1,44 @@
 import Task from "../models/Task.model"
 import { fetchUser } from "../services/User.service"
+import { Priority, Category } from "../models/Task.model"
+const getPrioEnum = (value: String) => {
+	switch (value) {
+		case "Urgent":
+			return Priority.URG
+		case "High":
+			return Priority.HIG
+		case "Medium":
+			return Priority.MED
+		case "Low":
+			return Priority.LOW
+		default:
+			throw new Error("Invalid enum value")
+	}
+}
+
+const getCategoryEnum = (value: String) => {
+	switch (value) {
+		case "NA":
+			return Category.NA
+		case "Assignment":
+			return Category.ASS
+		case "Hobby":
+			return Category.HOB
+		case "Relaxing":
+			return Category.REL
+		case "Exercises":
+			return Category.EXE
+		default:
+			throw new Error("Invalid enum value")
+	}
+}
 
 export const addTask = async (
 	dueDate: Date,
 	lengthOfWork: number,
-	user: string,
+	priorityValue: string,
+	token: string,
+	categoryValue: string,
 	name?: string,
 	description?: string
 ) => {
@@ -13,15 +47,25 @@ export const addTask = async (
 	if (dueDate < now) {
 		throw new Error("Invalid due date")
 	}
-
-	//do we need to validate user? is user the email?
+	const priority = getPrioEnum(priorityValue)
+	const user = await fetchUser(token)
+	name = name ? name : "New Task"
+	description = description ? description : ""
+	const category = getCategoryEnum(categoryValue)
 
 	// Create the new task
-	const task = new Task({ dueDate, lengthOfWork, name, description, user })
+	const task = new Task({
+		dueDate,
+		lengthOfWork,
+		name,
+		description,
+		user,
+		category,
+	})
 	return task.save()
 }
 
-export async function getTask(taskId: string) {
+export const getTask = async (taskId: string) => {
 	try {
 		const task = await Task.findById(taskId)
 
