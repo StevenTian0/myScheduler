@@ -1,6 +1,7 @@
 import Task from "../models/Task.model"
 import { fetchUser } from "../services/User.service"
 import { Priority, Category } from "../models/Task.model"
+
 const getPrioEnum = (value: String) => {
 	switch (value) {
 		case "Urgent":
@@ -122,6 +123,7 @@ export async function deleteTask(_id: string) {
 
 interface IUpdateTaskInput {
 	_id: string
+	token: string
 	newDueDate?: Date
 	newLengthOfWork?: number
 	newName?: string
@@ -131,6 +133,7 @@ interface IUpdateTaskInput {
 
 export const updateTask = async ({
 	_id,
+	token,
 	newDueDate,
 	newLengthOfWork,
 	newName,

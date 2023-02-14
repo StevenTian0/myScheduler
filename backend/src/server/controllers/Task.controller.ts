@@ -41,6 +41,7 @@ export const updateController = async (req: Request, res: Response) => {
 	try {
 		const {
 			_id,
+			token,
 			newDueDate,
 			newLengthOfWork,
 			newName,
@@ -50,6 +51,7 @@ export const updateController = async (req: Request, res: Response) => {
 
 		const task = await updateTask({
 			_id,
+			token,
 			newDueDate,
 			newLengthOfWork,
 			newName,
