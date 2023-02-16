@@ -3,7 +3,6 @@ import "./App.css";
 import axios from "axios";
 import Note from "./note";
 import Button from "@mui/material/Button";
-import Demo from "./Demo";
 import Calendar from "./Calendar";
 function App() {
   //notes is a list of note components
