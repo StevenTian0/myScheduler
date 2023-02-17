@@ -121,6 +121,24 @@ export async function deleteTask(_id: string) {
 	}
 }
 
+export const deleteAllTasks = async (userId: string) => {
+	try {
+		const tasks = await Task.find({ user: userId })
+
+		if (!tasks) {
+			throw new Error("Tasks not found")
+		}
+
+		await Task.deleteMany({ user: userId })
+
+		return {
+			message: "All tasks deleted successfully",
+		}
+	} catch (error) {
+		throw error
+	}
+}
+
 interface IUpdateTaskInput {
 	_id: string
 	token: string
