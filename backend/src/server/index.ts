@@ -8,6 +8,8 @@ import helmet from "helmet"
 import mongoose from "mongoose"
 import userRouter from "./routers/User.router"
 import taskRouter from "./routers/Task.router"
+import blockerRouter from "./routers/Blocker.router"
+
 
 dotenv.config()
 
@@ -38,6 +40,7 @@ app.use(express.json())
  */
 app.use(userRouter)
 app.use(taskRouter)
+app.use(blockerRouter)
 
 /**
  * Connect to MongoDB
