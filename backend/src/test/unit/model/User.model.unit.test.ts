@@ -1,10 +1,12 @@
 import { expect } from "chai"
-import { describe, it, afterEach, after } from "mocha"
+import { describe, it, afterEach, before, after } from "mocha"
 import User, { UiColor, LanguagePref } from "../../../server/models/User.model"
 import mongoose from "mongoose"
 
-require("../../../server/index")
 describe("User model", function () {
+	before(async () => {
+		mongoose.connect("mongodb://localhost:27017/my_scheduler")
+	})
 	afterEach(async () => {
 		await User.deleteOne({ email: "testuser@example.com" })
 	})
