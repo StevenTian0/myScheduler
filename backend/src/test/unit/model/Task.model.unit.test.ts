@@ -8,13 +8,13 @@ describe("Task model", () => {
 		await mongoose.connect("mongodb://localhost:27017/my_scheduler")
 	})
 
-	afterEach(async () => {
-		await Task.deleteMany({})
-	})
+	// afterEach(async () => {
+	// 	await Task.deleteMany({})
+	// })
 
-	after(async () => {
-		await mongoose.connection.close()
-	})
+	// after(async () => {
+	// 	await mongoose.connection.close()
+	// })
 
 	it("should be invalid if name is empty", async () => {
 		const task = new Task({
@@ -107,9 +107,9 @@ describe("Task model", () => {
 		const userId = new mongoose.Types.ObjectId()
 
 		const task = new Task({
-			_id: "1",
+			_id: "19",
 			priority: Priority.URG,
-			dueDate: new Date(),
+			dueDate: "2023-02-25T22:39:55.872Z",
 			lengthOfWork: 60,
 			name: "Test Task",
 			category: Category.NA,
@@ -118,7 +118,7 @@ describe("Task model", () => {
 
 		await task.save()
 
-		const savedTask = await Task.findOne({ _id: "1" })
+		const savedTask = await Task.findOne({ _id: "19" })
 
 		if (savedTask) {
 			expect(savedTask.priority).to.equal(task.priority)
@@ -128,7 +128,9 @@ describe("Task model", () => {
 			expect(savedTask.name).to.equal(task.name)
 			expect(savedTask.description).to.equal(task.description)
 			expect(savedTask.category).to.equal(task.category)
-			expect(savedTask.user.userId).to.equal(userId)
+			expect(savedTask.user.userId).to.equal(task.user.userId)
 		}
+
+		await task.remove()
 	})
 })
