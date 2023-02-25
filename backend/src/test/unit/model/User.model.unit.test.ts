@@ -1,9 +1,17 @@
 import { expect } from "chai"
-import { describe, it } from "mocha"
-import mongoose, { Error as MongooseError } from "mongoose"
+import { describe, it, afterEach, after } from "mocha"
 import User, { UiColor, LanguagePref } from "../../../server/models/User.model"
+import mongoose from "mongoose"
 
+require("../../../server/index")
 describe("User model", function () {
+	afterEach(async () => {
+		await User.deleteOne({ email: "testuser@example.com" })
+	})
+	after(async () => {
+		await mongoose.connection.close()
+	})
+
 	it("should be invalid if username is empty", async () => {
 		const user = new User({
 			email: "testuser@example.com",
@@ -47,16 +55,15 @@ describe("User model", function () {
 		expect(user.languagePref).to.equal(LanguagePref.EN)
 	})
 
-	// it("should hash password before saving", async (done) => {
-	// 	const user = new User({
-	// 		email: "testuser@example.com",
-	// 		username: "testuser",
-	// 		password: "testpassword",
-	// 	})
-	// 	await user.save()
-	// 	expect(user.password).to.not.equal("testpassword")
-	// 	done()
-	// })
+	it("should hash password before saving", async () => {
+		const user = new User({
+			email: "testuser@example.com",
+			username: "testuser",
+			password: "testpassword",
+		})
+		await user.save()
+		expect(user.password).to.not.equal("testpassword")
+	})
 
 	it("should allow saving a user with a valid schema", async () => {
 		const user = new User({
