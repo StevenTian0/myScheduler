@@ -10,9 +10,9 @@ describe("User model", function () {
 	afterEach(async () => {
 		await User.deleteOne({ email: "testuser@example.com" })
 	})
-	after(async () => {
-		await mongoose.connection.close()
-	})
+	// after(async () => {
+	// 	await mongoose.connection.close()
+	// })
 
 	it("should be invalid if username is empty", async () => {
 		const user = new User({
