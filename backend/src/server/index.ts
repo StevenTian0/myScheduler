@@ -10,7 +10,6 @@ import userRouter from "./routers/User.router"
 import taskRouter from "./routers/Task.router"
 import blockerRouter from "./routers/Blocker.router"
 
-
 dotenv.config()
 
 /**
@@ -27,6 +26,7 @@ const PORT: number = parseInt(process.env.PORT as string, 10)
 const MONGODB_URI: string = process.env.MONGODB_URI as string
 
 const app = express()
+export default app
 
 /**
  * Middleware
