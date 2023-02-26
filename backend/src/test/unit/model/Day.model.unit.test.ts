@@ -12,10 +12,6 @@ describe("Day model", () => {
 		await mongoose.connection.close()
 	})
 
-	// afterEach(async () => {
-	// 	await Day.deleteOne({ _id: day._id })
-	// })
-
 	it("should allow saving a day with a valid schema", async () => {
 		const userId = new mongoose.Types.ObjectId()
 		const hoursWorked = 5

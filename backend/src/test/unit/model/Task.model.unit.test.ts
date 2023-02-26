@@ -8,10 +8,6 @@ describe("Task model", () => {
 		await mongoose.connect("mongodb://localhost:27017/my_scheduler")
 	})
 
-	// afterEach(async () => {
-	// 	await Task.deleteMany({})
-	// })
-
 	after(async () => {
 		await mongoose.connection.close()
 	})

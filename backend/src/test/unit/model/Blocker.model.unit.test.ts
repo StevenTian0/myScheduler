@@ -7,9 +7,6 @@ describe("Blocker model", () => {
 	before(async () => {
 		mongoose.connect("mongodb://localhost:27017/my_scheduler")
 	})
-	afterEach(async () => {
-		await Blocker.deleteOne({ time: "2060-02-13T07:00:00.000Z" })
-	})
 	after(async () => {
 		await mongoose.connection.close()
 	})
@@ -103,5 +100,6 @@ describe("Blocker model", () => {
 			expect(savedBlocker.description).to.equal(blocker.description)
 			expect(savedBlocker.user.userId).to.equal(blocker.user.userId)
 		}
+		await blocker.removed()
 	})
 })
