@@ -7,9 +7,6 @@ describe("User model", function () {
 	before(async () => {
 		mongoose.connect("mongodb://localhost:27017/my_scheduler")
 	})
-	afterEach(async () => {
-		await User.deleteOne({ email: "testuser@example.com" })
-	})
 	after(async () => {
 		await mongoose.connection.close()
 	})
@@ -65,6 +62,7 @@ describe("User model", function () {
 		})
 		await user.save()
 		expect(user.password).to.not.equal("testpassword")
+		await User.deleteOne({ email: "testuser@example.com" })
 	})
 
 	it("should allow saving a user with a valid schema", async () => {
@@ -85,5 +83,6 @@ describe("User model", function () {
 			expect(savedUser.languagePref).to.equal(LanguagePref.FR)
 			expect(savedUser.score).to.equal(42)
 		}
+		await User.deleteOne({ email: "testuser@example.com" })
 	})
 })

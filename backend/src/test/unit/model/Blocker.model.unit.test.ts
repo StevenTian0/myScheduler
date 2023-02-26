@@ -6,14 +6,13 @@ import mongoose from "mongoose"
 describe("Blocker model", () => {
 	before(async () => {
 		mongoose.connect("mongodb://localhost:27017/my_scheduler")
-		//await Blocker.deleteOne({ time: "2060-02-13T07:00:00.000Z" })
 	})
 	afterEach(async () => {
 		await Blocker.deleteOne({ time: "2060-02-13T07:00:00.000Z" })
 	})
-	// after(async () => {
-	// 	await mongoose.connection.close()
-	// })
+	after(async () => {
+		await mongoose.connection.close()
+	})
 	it("should be invalid if time is empty", async () => {
 		const blocker = new Blocker({
 			duration: 60,

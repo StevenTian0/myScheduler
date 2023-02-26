@@ -8,9 +8,9 @@ describe("Day model", () => {
 		await mongoose.connect("mongodb://localhost:27017/my_scheduler")
 	})
 
-	// after(async () => {
-	// 	await mongoose.connection.close()
-	// })
+	after(async () => {
+		await mongoose.connection.close()
+	})
 
 	// afterEach(async () => {
 	// 	await Day.deleteOne({ _id: day._id })

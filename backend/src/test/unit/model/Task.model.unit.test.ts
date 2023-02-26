@@ -12,9 +12,9 @@ describe("Task model", () => {
 	// 	await Task.deleteMany({})
 	// })
 
-	// after(async () => {
-	// 	await mongoose.connection.close()
-	// })
+	after(async () => {
+		await mongoose.connection.close()
+	})
 
 	it("should be invalid if name is empty", async () => {
 		const task = new Task({
