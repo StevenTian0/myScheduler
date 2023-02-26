@@ -11,15 +11,16 @@ describe("POST /api/user/signUp", () => {
 	// Declare a variable to hold a sinon stub for the User.save() method
 	let createUserStub
 
-	// Run this function before all tests to sign up an existing user, used to test for duplicate
+	// Run this function before all tests to sign up an existing user
 	before(async () => {
 		const user = new User({
 			email: "existinguser@example.com",
 			username: "existinguser",
-			password: "Testexisting123",
+			password: "Existingpassword123",
 		})
 		await user.save()
 	})
+	// Delete the existing user after all tests
 	after(async () => {
 		await User.deleteOne({ email: "existinguser@example.com" })
 	})
@@ -104,6 +105,27 @@ describe("POST /api/user/signUp", () => {
 			})
 	})
 
+	// Define a test case for when a user with an invalid email address tries to sign up
+	it("should fail to create a user with an invalid email address", (done) => {
+		// Make a POST request to the sign-up route with the invalid password
+		supertest(app)
+			.post("/api/user/signUp")
+			.send({
+				email: "invalidemail",
+				username: "testuser",
+				password: "Testpassword123",
+			})
+			.expect(400) // Expect the response status code to be 400
+			.end((err, res) => {
+				// If there's an error, pass it to the done() function to fail the test
+				if (err) return done(err)
+
+				// Assert that the response body contains the expected error message
+				expect(res.body.error).to.equal("Invalid email address")
+				done()
+			})
+	})
+
 	// Define a test case for when a user with an invalid password tries to sign up
 	it("should fail to create a user with an invalid password", (done) => {
 		// Make a POST request to the sign-up route with the invalid password
@@ -123,6 +145,71 @@ describe("POST /api/user/signUp", () => {
 				expect(res.body.error).to.equal(
 					"Password must be at least 7 characters long, contain one uppercase letter, one lowercase letter and one digit"
 				)
+				done()
+			})
+	})
+})
+
+// Define a test suite for the "POST /api/user/signUp" route
+describe("POST /api/user/login", () => {
+	// Run this function before all tests to sign up an existing user
+	before(async () => {
+		const user = new User({
+			email: "existinguser@example.com",
+			username: "existinguser",
+			password: "Existingpassword123",
+		})
+		await user.save()
+	})
+	// Delete the existing user after all tests
+	after(async () => {
+		await User.deleteOne({ email: "existinguser@example.com" })
+	})
+
+	it("should successfully login a user with valid inputs", (done) => {
+		let username = "existinguser"
+		let password = "Existingpassword123"
+		supertest(app)
+			.post("/api/user/login")
+			.send({ username: username, password: password })
+			.expect(200)
+			.end((err, res) => {
+				if (err) return done(err)
+				expect(res.body).to.have.property("user")
+				expect(res.body.user).to.have.property(
+					"email",
+					"existinguser@example.com"
+				)
+				expect(res.body.user).to.have.property("username", username)
+				expect(res.body).to.have.property("token")
+				done()
+			})
+	})
+
+	it("should fail to login a user with invalid username", (done) => {
+		let username = "wrongusername"
+		let password = "Existingpassword123"
+		supertest(app)
+			.post("/api/user/login")
+			.send({ username: username, password: password })
+			.expect(400)
+			.end((err, res) => {
+				if (err) return done(err)
+				expect(res.body.error).to.equal("Username or password is incorrect")
+				done()
+			})
+	})
+
+	it("should fail to login a user with invalid password", (done) => {
+		let username = "existinguser"
+		let password = "Wrongpassword123"
+		supertest(app)
+			.post("/api/user/login")
+			.send({ username: username, password: password })
+			.expect(400)
+			.end((err, res) => {
+				if (err) return done(err)
+				expect(res.body.error).to.equal("Username or password is incorrect")
 				done()
 			})
 	})

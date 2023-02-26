@@ -94,7 +94,7 @@ export const loginService = async (credentials: ILoginCredentials) => {
 
 	// If no user is found, return an error
 	if (!user) {
-		throw new Error("Username not found")
+		throw new Error("Username or password is incorrect")
 	}
 
 	// Compare the provided password with the hashed password stored in the database
@@ -102,7 +102,7 @@ export const loginService = async (credentials: ILoginCredentials) => {
 
 	// If the password is incorrect, return an error
 	if (!isPasswordCorrect) {
-		throw new Error("Password is incorrect")
+		throw new Error("Username or password is incorrect")
 	}
 	// If the username and password are both correct, return the user object and a JWT
 	const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, {
