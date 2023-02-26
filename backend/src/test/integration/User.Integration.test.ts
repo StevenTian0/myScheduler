@@ -1,6 +1,6 @@
 // Import necessary modules and dependencies
 import { expect } from "chai"
-import { describe, it, beforeEach, afterEach } from "mocha"
+import { describe, it, beforeEach, afterEach, before, after } from "mocha"
 import User from "../../server/models/User.model"
 import sinon from "sinon"
 import supertest from "supertest"
@@ -11,6 +11,18 @@ describe("POST /api/user/signUp", () => {
 	// Declare a variable to hold a sinon stub for the User.save() method
 	let createUserStub
 
+	// Run this function before all tests to sign up an existing user, used to test for duplicate
+	before(async () => {
+		const user = new User({
+			email: "existinguser@example.com",
+			username: "existinguser",
+			password: "Testexisting123",
+		})
+		await user.save()
+	})
+	after(async () => {
+		await User.deleteOne({ email: "existinguser@example.com" })
+	})
 	// Run this function before each test to set up the stub
 	beforeEach(() => {
 		createUserStub = sinon.stub(User.prototype, "save")
@@ -52,17 +64,11 @@ describe("POST /api/user/signUp", () => {
 
 	// Define a test case for when a user with an existing email tries to sign up
 	it("should fail to create a user with an existing email", (done) => {
-		// Set up the mock response from User.save()
-		const error = new Error("Email already exists") as any
-		error.name = "MongoError"
-		error.code = 11000
-		createUserStub.rejects(error)
-
-		// Make a POST request to the sign-up route with the existing email address
+		// Make a POST request to the sign-up route with the existing username
 		supertest(app)
 			.post("/api/user/signUp")
 			.send({
-				email: "testuser@example.com",
+				email: "existinguser@example.com",
 				username: "testuser",
 				password: "Testpassword123",
 			})
@@ -72,7 +78,51 @@ describe("POST /api/user/signUp", () => {
 				if (err) return done(err)
 
 				// Assert that the response body contains the expected error message
-				expect(res.body.error).to.equal("Email already exists")
+				expect(res.body.error).to.equal("Email or username already exists")
+				done()
+			})
+	})
+
+	// Define a test case for when a user with an existing username tries to sign up
+	it("should fail to create a user with an existing username", (done) => {
+		// Make a POST request to the sign-up route with the existing email address
+		supertest(app)
+			.post("/api/user/signUp")
+			.send({
+				email: "testuser@example.com",
+				username: "existinguser",
+				password: "Testpassword123",
+			})
+			.expect(400) // Expect the response status code to be 400
+			.end((err, res) => {
+				// If there's an error, pass it to the done() function to fail the test
+				if (err) return done(err)
+
+				// Assert that the response body contains the expected error message
+				expect(res.body.error).to.equal("Email or username already exists")
+				done()
+			})
+	})
+
+	// Define a test case for when a user with an invalid password tries to sign up
+	it("should fail to create a user with an invalid password", (done) => {
+		// Make a POST request to the sign-up route with the invalid password
+		supertest(app)
+			.post("/api/user/signUp")
+			.send({
+				email: "testuser@example.com",
+				username: "testuser",
+				password: "invalidpassword",
+			})
+			.expect(400) // Expect the response status code to be 400
+			.end((err, res) => {
+				// If there's an error, pass it to the done() function to fail the test
+				if (err) return done(err)
+
+				// Assert that the response body contains the expected error message
+				expect(res.body.error).to.equal(
+					"Password must be at least 7 characters long, contain one uppercase letter, one lowercase letter and one digit"
+				)
 				done()
 			})
 	})
