@@ -42,23 +42,19 @@ app.use(userRouter)
 app.use(taskRouter)
 app.use(blockerRouter)
 
-/**
- * Connect to MongoDB
- * Assign MongoDB as constant
- */
+// Wait for MongoDB to be connected before starting the server
+mongoose.connection.once("connected", () => {
+	app.listen(PORT, () => {
+		console.log(`Started server!`)
+		console.log(`Listening on port ${PORT}`)
+	})
+})
+
 mongoose.connect(MONGODB_URI, (error) => {
 	if (error) {
 		console.error(`Failed to connect to MongoDB: ${error}`)
 		process.exit(1)
 	}
 
-	console.log("Connected to MongoDB")
-})
-
-/**
- * Start Server
- */
-app.listen(PORT, () => {
-	console.log(`Started server!`)
-	console.log(`Listening on port ${PORT}`)
+	console.log("Connecting to MongoDB")
 })
