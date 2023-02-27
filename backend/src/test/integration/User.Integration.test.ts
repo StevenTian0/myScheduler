@@ -5,6 +5,7 @@ import User from "../../server/models/User.model"
 import sinon from "sinon"
 import supertest from "supertest"
 import app from "../../server/index"
+import { loginService } from "../../server/services/User.service"
 
 // Define a test suite for the "POST /api/user/signUp" route
 describe("POST /api/user/signUp", () => {
@@ -211,6 +212,33 @@ describe("POST /api/user/login", () => {
 				if (err) return done(err)
 				expect(res.body.error).to.equal("Username or password is incorrect")
 				done()
+			})
+	})
+})
+
+describe("DELETE /api/user/delete", () => {
+	it("should successfully delete a user with valid inputs", async () => {
+		const user = new User({
+			email: "existinguser@example.com",
+			username: "existinguser",
+			password: "Existingpassword123",
+		})
+		await user.save()
+		let token = (
+			await loginService({
+				username: "existinguser",
+				password: "Existingpassword123",
+			})
+		).token
+		supertest(app)
+			.delete("/api/user/delete")
+			.send({ token })
+			.expect(200)
+			.end((err, res) => {
+				expect(res.body).to.have.property(
+					"message",
+					"Account under email existinguser@example.com deleted successfully"
+				)
 			})
 	})
 })

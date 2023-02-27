@@ -44,7 +44,7 @@ app.use(blockerRouter)
 
 // Wait for MongoDB to be connected before starting the server
 mongoose.connection.once("connected", () => {
-	app.listen(PORT, () => {
+	var server = app.listen(PORT, () => {
 		console.log(`Started server!`)
 		console.log(`Listening on port ${PORT}`)
 	})
