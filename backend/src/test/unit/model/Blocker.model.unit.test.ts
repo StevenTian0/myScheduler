@@ -100,6 +100,6 @@ describe("Blocker model", () => {
 			expect(savedBlocker.description).to.equal(blocker.description)
 			expect(savedBlocker.user.userId).to.equal(blocker.user.userId)
 		}
-		await blocker.removed()
+		await blocker.remove()
 	})
 })
