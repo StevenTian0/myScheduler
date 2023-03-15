@@ -4,7 +4,7 @@
   "private": true,
   "proxy": "http://localhost:3000/",
   "dependencies": {
-    "@daypilot/daypilot-lite-react": "^3.12.0",
+    "@daypilot/daypilot-lite-react": "^3.12.1",
     "@emotion/react": "^11.10.5",
     "@emotion/styled": "^11.10.5",
     "@fullcalendar/core": "^6.1.4",
