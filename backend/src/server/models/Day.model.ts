@@ -1,13 +1,5 @@
 import mongoose, { Schema, Document } from "mongoose"
 
-// Define the interface for the Day model
-export interface IDay extends Document {
-	hoursWorked: number
-	workCompleted: Array<number>
-	taskCompleted: Array<mongoose.Types.ObjectId>
-	user: string
-}
-
 // Define the DaySchema using Mongoose Schema
 const DaySchema: Schema = new Schema({
 	hoursWorked: { type: Number, default: 0 }, // The length of work in total defaults to 0
@@ -16,4 +8,4 @@ const DaySchema: Schema = new Schema({
 	user: { type: mongoose.Types.ObjectId, ref: "User" }, // The user who worked on the tasks of the day is a reference to the User model
 })
 
-export default mongoose.model<IDay>("Day", DaySchema)
+export default mongoose.model("Day", DaySchema)
