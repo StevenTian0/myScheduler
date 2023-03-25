@@ -30,9 +30,8 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const Signup = () => {
+const Login = () => {
   const [formData, setFormData] = useState({
-    email: "",
     username: "",
     password: "",
   });
@@ -48,12 +47,13 @@ const Signup = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const res = await axios.post("/api/user/signUp", {
-        email,
+      const res = await axios.post("/api/user/login", {
         username,
         password,
       });
-      console.log(res.data);
+      const { user, token } = res.data;
+      localStorage.setItem('token', token);
+      console.log("User is Logged in");
     } catch (err) {
       console.error(err.response.data);
     }
@@ -63,20 +63,9 @@ const Signup = () => {
     <Container className={classes.container} maxWidth="lg">
       <form onSubmit={handleSubmit} className={classes.form}>
         <Typography variant="h5" className={classes.title}>
-          Sign Up
+          Login
         </Typography>
         <Grid container spacing={2}>
-          <Grid item xs={12}>
-            <TextField
-              fullWidth
-              label="Email"
-              type="email"
-              name="email"
-              value={email}
-              onChange={handleChange}
-              required
-            />
-          </Grid>
           <Grid item xs={12}>
             <TextField
               fullWidth
@@ -101,7 +90,7 @@ const Signup = () => {
           </Grid>
           <Grid item xs={12}>
             <Button variant="contained" color="primary" type="submit">
-              Sign Up
+              Login
             </Button>
           </Grid>
         </Grid>
@@ -110,4 +99,4 @@ const Signup = () => {
   );
 };
 
-export default Signup;
+export default Login;
