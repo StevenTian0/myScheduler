@@ -103,6 +103,8 @@ export async function getAllTasks(token: string) {
 	}
 }
 
+
+
 export async function deleteTask(_id: string) {
 	try {
 		const task = await Task.findById(_id)
