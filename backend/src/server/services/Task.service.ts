@@ -88,7 +88,6 @@ export const getTask = async (taskId: string) => {
 
 export async function getAllTasks(token: string) {
 	try {
-		console.log(token)
 		const user = await fetchUser(token)
 		const tasks = await Task.find({ user: user._id })
 

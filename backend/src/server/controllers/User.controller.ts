@@ -10,7 +10,7 @@ import {
 
 export const deleteUserAccount = async (req: Request, res: Response) => {
 	try {
-		const { token } = req.body
+		const { token } = req.params
 		const result = await deleteAccount(token)
 
 		res.status(200).json(result)
@@ -47,7 +47,7 @@ export const signUpController = async (req: Request, res: Response) => {
 
 export const getUserScoreController = async (req: Request, res: Response) => {
 	try {
-		const { token } = req.body
+		const { token } = req.params
 		const score = await getUserScore(token)
 		res.status(201).json({ message: "Score get successfully", score })
 	} catch (error: any) {
@@ -77,7 +77,7 @@ export const toggleColorUserController = async (
 	res: Response
 ) => {
 	try {
-		const { token } = req.body
+		const { token } = req.params
 		const result = await toggleColor(token)
 		res.status(200).json(result)
 	} catch (error: any) {
