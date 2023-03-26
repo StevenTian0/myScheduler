@@ -42,6 +42,7 @@ app.use(express.json())
 app.use(userRouter)
 app.use(taskRouter)
 app.use(blockerRouter)
+app.use(dayRouter)
 
 // Wait for MongoDB to be connected before starting the server
 mongoose.connection.once("connected", () => {

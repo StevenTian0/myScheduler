@@ -3,17 +3,16 @@ import User from "../models/User.model"
 import Task from "../models/Task.model"
 
 interface ICreateDayInput {
-	_id: string
+	dayId: string
 	hoursWorked?: number[]
 	tasksWorked?: string[]
-	user: string
+	userEmail: string
 }
 
 interface IUpdateDayInput {
-	_id: string
+	dayId: string
 	hoursWorked?: number[]
 	tasksWorked?: string[]
-	user?: string
 }
 
 const checkHoursAndTasks = (hours: number[], tasks: string[]) => {
@@ -26,7 +25,7 @@ const checkHoursAndTasks = (hours: number[], tasks: string[]) => {
 
 export const createDay = async (dayInput: ICreateDayInput) => {
 	// Check if the passed user exists in the database
-	const user = await User.findById(dayInput.user)
+	const user = await User.findOne({ email: dayInput.userEmail })
 	if (!user) {
 		throw new Error("User not found")
 	}
@@ -34,11 +33,10 @@ export const createDay = async (dayInput: ICreateDayInput) => {
 	checkHoursAndTasks(dayInput.hoursWorked || [], dayInput.tasksWorked || [])
 
 	// Check if the passed tasks exist in the database
-	const tasks = await Task.find({ _id: { $in: dayInput.tasksWorked || [] } })
+	const tasks = await Task.find({ taskId: { $in: dayInput.tasksWorked || [] } })
 	if (dayInput.tasksWorked && tasks.length !== dayInput.tasksWorked.length) {
 		throw new Error("One or more tasks not found")
 	}
-
 	const newDay = new Day(dayInput)
 	return await newDay.save()
 }
@@ -49,7 +47,7 @@ export const createEmptyDay = async (_id: string, user: string) => {
 }
 
 export const getDayById = async (dayId: string) => {
-	const day = await Day.findById(dayId).populate("tasksWorked").populate("user")
+	const day = await Day.findById(dayId)
 	if (!day) {
 		throw new Error("Day not found")
 	}
@@ -57,7 +55,7 @@ export const getDayById = async (dayId: string) => {
 }
 
 export const updateDay = async (dayUpdates: IUpdateDayInput) => {
-	const day = await Day.findById(dayUpdates._id)
+	const day = await Day.findById(dayUpdates.dayId)
 	if (!day) {
 		throw new Error("Day not found")
 	}
@@ -70,7 +68,9 @@ export const updateDay = async (dayUpdates: IUpdateDayInput) => {
 	}
 
 	// Check if the passed tasks exist in the database
-	const tasks = await Task.find({ _id: { $in: dayUpdates.tasksWorked || [] } })
+	const tasks = await Task.find({
+		taskId: { $in: dayUpdates.tasksWorked || [] },
+	})
 	if (
 		dayUpdates.tasksWorked &&
 		tasks.length !== dayUpdates.tasksWorked.length
@@ -78,15 +78,9 @@ export const updateDay = async (dayUpdates: IUpdateDayInput) => {
 		throw new Error("One or more tasks not found")
 	}
 
-	// Check if the passed user exists in the database
-	if (dayUpdates.user) {
-		const user = await User.findById(dayUpdates.user)
-		if (!user) {
-			throw new Error("User not found")
-		}
-	}
-
-	return await Day.findByIdAndUpdate(dayUpdates._id, dayUpdates, { new: true })
+	return await Day.findByIdAndUpdate(dayUpdates.dayId, dayUpdates, {
+		new: true,
+	})
 }
 
 export const deleteDay = async (dayId: string) => {

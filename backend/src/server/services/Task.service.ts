@@ -57,7 +57,7 @@ export const addTask = async (
 
 	// Create the new task
 	const task = new Task({
-		_id,
+		taskId: _id,
 		dueDate,
 		priority,
 		lengthOfWork,
@@ -71,7 +71,7 @@ export const addTask = async (
 
 export const getTask = async (_id: string) => {
 	try {
-		const task = await Task.findById(_id)
+		const task = await Task.findOne({ taskId: _id })
 
 		if (!task) {
 			throw new Error("Task not found")
@@ -103,11 +103,9 @@ export async function getAllTasks(token: string) {
 	}
 }
 
-
-
 export async function deleteTask(_id: string) {
 	try {
-		const task = await Task.findById(_id)
+		const task = await Task.findOne({ taskId: _id })
 
 		if (!task) {
 			throw new Error("Task not found")
