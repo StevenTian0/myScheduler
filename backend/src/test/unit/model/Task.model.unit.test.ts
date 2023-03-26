@@ -103,7 +103,7 @@ describe("Task model", () => {
 		const userId = new mongoose.Types.ObjectId()
 
 		const task = new Task({
-			_id: "19",
+			taskId: "19",
 			priority: Priority.URG,
 			dueDate: "2023-02-25T22:39:55.872Z",
 			lengthOfWork: 60,
@@ -114,7 +114,7 @@ describe("Task model", () => {
 
 		await task.save()
 
-		const savedTask = await Task.findOne({ _id: "19" })
+		const savedTask = await Task.findOne({ taskId: "19" })
 
 		if (savedTask) {
 			expect(savedTask.priority).to.equal(task.priority)
