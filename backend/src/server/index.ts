@@ -9,6 +9,7 @@ import mongoose from "mongoose"
 import userRouter from "./routers/User.router"
 import taskRouter from "./routers/Task.router"
 import blockerRouter from "./routers/Blocker.router"
+import dayRouter from "./routers/Day.router"
 
 dotenv.config()
 
