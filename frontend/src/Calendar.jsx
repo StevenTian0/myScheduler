@@ -70,23 +70,20 @@ class Calendar extends Component {
     };
   }
 
-    handleAddTask = async () => {
-      const dp = this.calendar;
-      const modal = await DayPilot.Modal.prompt(
-        "Create a new task:",
-        "Task 1"
-      );
-      dp.clearSelection();
-      if (!modal.result) {
-        return;
-      }
-      dp.events.add({
-        start: dp.visibleStart(),
-        end: dp.visibleEnd(),
-        id: DayPilot.guid(),
-        text: modal.result,
-      });
-    };
+  handleAddTask = async () => {
+    const dp = this.calendar;
+    const modal = await DayPilot.Modal.prompt("Create a new task:", "Task 1");
+    dp.clearSelection();
+    if (!modal.result) {
+      return;
+    }
+    dp.events.add({
+      start: dp.visibleStart(),
+      end: dp.visibleEnd(),
+      id: DayPilot.guid(),
+      text: modal.result,
+    });
+  };
 
   get calendar() {
     return this.calendarRef.current.control;
@@ -192,11 +189,13 @@ class Calendar extends Component {
               });
             }}
           />
-         <div style={styles.addButton} onClick={this.handleAddTask}>+ Add New Task</div>
+          <div style={styles.addButton} onClick={this.handleAddTask}>
+            + Add New Task
+          </div>
         </div>
         <div style={styles.main}>
           <div style={{ position: "relative" }}>
-             <DayPilotCalendar {...this.state} ref={this.calendarRef} />
+            <DayPilotCalendar {...this.state} ref={this.calendarRef} />
           </div>
         </div>
       </div>

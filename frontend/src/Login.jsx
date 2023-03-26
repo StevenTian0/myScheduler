@@ -12,6 +12,10 @@ import { Link } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 
 const useStyles = makeStyles((theme) => ({
+  errorText: {
+    color: "red",
+    marginTop: "0.5rem",
+  },
   container: {
     backgroundColor: "#f5f5f5",
     height: "100vh",
@@ -35,6 +39,12 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const Login = () => {
+  const [error, setError] = useState("");
+
+  const handlePasswordChange = (e) => {
+    setError("");
+    handleChange(e);
+  };
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
     username: "",
@@ -61,6 +71,7 @@ const Login = () => {
       console.log("User is Logged in");
       navigate("/calendar");
     } catch (err) {
+      setError("Invalid password!");
       console.error(err.response.data);
     }
   };
@@ -93,6 +104,8 @@ const Login = () => {
                 value={password}
                 onChange={handleChange}
                 required
+                error={!!error}
+                helperText={error}
               />
             </Grid>
             <Grid item xs={12}>
