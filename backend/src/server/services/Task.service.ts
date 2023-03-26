@@ -89,7 +89,7 @@ export const getTask = async (taskId: string) => {
 export async function getAllTasks(token: string) {
 	try {
 		const user = await fetchUser(token)
-		const tasks = await Task.find({ user: user.taskId })
+		const tasks = await Task.find({ user: user._id })
 
 		if (!tasks) {
 			throw new Error("Tasks not found")
