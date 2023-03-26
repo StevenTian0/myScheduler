@@ -57,10 +57,17 @@ function AddTask(props) {
 
   function handleFormSubmit(e) {
     e.preventDefault();
+    const offsetInMilliseconds = 5 * 60 * 60 * 1000; // 5 hours in milliseconds
+    const adjustedStart = new Date(
+      new Date(taskStart).getTime() - offsetInMilliseconds
+    );
+    const adjustedEnd = new Date(
+      new Date(taskEnd).getTime() - offsetInMilliseconds
+    );
     const newTask = {
       text: taskText,
-      start: taskStart,
-      end: taskEnd,
+      start: adjustedStart,
+      end: adjustedEnd,
       description: taskDescription,
       category: taskCategory,
       priority: taskPriority,

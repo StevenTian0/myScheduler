@@ -6,7 +6,6 @@ import {
   DayPilotNavigator,
 } from "@daypilot/daypilot-lite-react";
 
-import TaskTable from "./TaskTable";
 import AddTask from "./AddTask";
 
 const styles = {
@@ -86,13 +85,19 @@ class Calendar extends Component {
 
   handleAddTask = (task) => {
     const dp = this.calendar;
-    const { text, start, end } = task;
+    const { text, start, end, description, category, priority } = task;
     const id = DayPilot.guid();
+    const eventColor =
+      priority === "high" ? "red" : priority === "medium" ? "orange" : "green";
     const newTask = {
       start: new Date(start).toISOString(),
       end: new Date(end).toISOString(),
       id,
       text: text,
+      description: description,
+      category: category,
+      priority: priority,
+      backColor: eventColor,
     };
     dp.events.add(newTask);
     console.log("New task added: ", newTask);
@@ -120,6 +125,7 @@ class Calendar extends Component {
         length_of_work: 10,
         category: "Homework",
         priority: "high",
+        //ybackColor: "red",
       },
     ];
 
