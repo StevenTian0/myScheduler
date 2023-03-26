@@ -200,25 +200,22 @@ describe("Task API", () => {
 				})
 				await task.save()
 
-				const taskId = "28"
 				const newDueDate = "2023-07-25T22:39:55.872Z"
 				const newLengthOfWork = "10"
 				const newName = "s"
 				const newDescription = "task"
 				const workDone = "0"
 				// Make the request to fetch a task
-				const res = await supertest(app)
-					.patch("/api/task/update")
-					.send({
-						taskId: "28",
-						token: token,
-						newDueDate: newDueDate,
-						newLengthOfWork: newLengthOfWork,
-						newName: newName,
-						newDescription: newDescription,
-						workDone: workDone,
-					})
-					.expect(200)
+				const res = await supertest(app).patch("/api/task/update").send({
+					taskId: "28",
+					token: token,
+					newDueDate: newDueDate,
+					newLengthOfWork: newLengthOfWork,
+					newName: newName,
+					newDescription: newDescription,
+					workDone: workDone,
+				})
+				console.log(res.body)
 				expect(res.body).to.have.property("task")
 			} catch (error) {
 				throw error

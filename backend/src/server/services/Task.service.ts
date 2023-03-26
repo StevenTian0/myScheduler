@@ -160,7 +160,7 @@ export const updateTask = async ({
 }: IUpdateTaskInput) => {
 	try {
 		// Find the task in the database
-		const task = await Task.findById(taskId)
+		const task = await Task.findOne({ taskId })
 		if (!task) {
 			throw new Error("Task not found")
 		}
@@ -198,11 +198,7 @@ export const updateTask = async ({
 			if (workDone < 0) {
 				throw new Error("Task progress cannot be negative")
 			} else {
-				task.workDoneSoFar = task.workDoneSoFar + workDone
-				// should priority be done? or should we have a status for complete tasks, or should be just delete it once done
-				//maybe not delete since we're making a performance report
-				if (task.workDoneSoFar == length) {
-				}
+				task.workDoneSoFar = workDone
 			}
 		}
 
