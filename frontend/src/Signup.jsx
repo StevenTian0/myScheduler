@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 import { makeStyles } from "@material-ui/core/styles";
 import {
   Container,
@@ -32,6 +33,7 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const Signup = () => {
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     email: "",
     username: "",
@@ -55,6 +57,7 @@ const Signup = () => {
         password,
       });
       console.log(res.data);
+      navigate("/");
     } catch (err) {
       console.error(err.response.data);
     }
