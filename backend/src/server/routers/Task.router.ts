@@ -9,10 +9,10 @@ import {
 
 const taskRouter = Router()
 
-taskRouter.post("/api/task/add", addController)
+taskRouter.post("/api/task/create", addController)
 taskRouter.patch("/api/task/update", updateController)
-taskRouter.delete("/api/task/delete", deleteController)
-taskRouter.get("/api/task/getATask", getController)
-taskRouter.get("/api/task/getAllTasks", getAllController)
+taskRouter.delete("/api/task/delete/:taskId", deleteController)
+taskRouter.get("/api/task/get/:taskId", getController)
+taskRouter.get("/api/task/getAll/:token", getAllController)
 
 export default taskRouter
