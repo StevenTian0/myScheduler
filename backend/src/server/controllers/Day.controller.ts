@@ -5,6 +5,7 @@ import {
 	deleteDay,
 	getDayById,
 	updateDay,
+	getTotalHoursWorked,
 } from "../services/Day.service"
 
 export const createDayController = async (req: Request, res: Response) => {
@@ -66,6 +67,19 @@ export const deleteDayController = async (req: Request, res: Response) => {
 		const deletedDay = await deleteDay(dayId)
 
 		res.status(200).json({ message: "Day deleted successfully", deletedDay })
+	} catch (error: any) {
+		res.status(400).json({ error: error.message })
+	}
+}
+
+export const getTotalHoursWorkedController = async (
+	req: Request,
+	res: Response
+) => {
+	try {
+		const { dayId } = req.body
+		const total = await getTotalHoursWorked(dayId)
+		res.status(200).json({ total })
 	} catch (error: any) {
 		res.status(400).json({ error: error.message })
 	}

@@ -41,13 +41,13 @@ export const createDay = async (dayInput: ICreateDayInput) => {
 	return await newDay.save()
 }
 
-export const createEmptyDay = async (_id: string, user: string) => {
-	const newDay = new Day({ _id, user })
+export const createEmptyDay = async (dayId: string, user: string) => {
+	const newDay = new Day({ dayId, user })
 	return await newDay.save()
 }
 
 export const getDayById = async (dayId: string) => {
-	const day = await Day.findById(dayId)
+	const day = await Day.findOne({ dayId })
 	if (!day) {
 		throw new Error("Day not found")
 	}
@@ -55,7 +55,7 @@ export const getDayById = async (dayId: string) => {
 }
 
 export const updateDay = async (dayUpdates: IUpdateDayInput) => {
-	const day = await Day.findById(dayUpdates.dayId)
+	const day = await Day.findOne({ dayId: dayUpdates.dayId })
 	if (!day) {
 		throw new Error("Day not found")
 	}
@@ -78,11 +78,24 @@ export const updateDay = async (dayUpdates: IUpdateDayInput) => {
 		throw new Error("One or more tasks not found")
 	}
 
-	return await Day.findByIdAndUpdate(dayUpdates.dayId, dayUpdates, {
+	return await Day.findOneAndUpdate({ dayId: dayUpdates.dayId }, dayUpdates, {
 		new: true,
 	})
 }
 
 export const deleteDay = async (dayId: string) => {
-	return await Day.findByIdAndDelete(dayId)
+	return await Day.findOneAndDelete({ dayId })
+}
+
+export const getTotalHoursWorked = async (dayId: string): Promise<number> => {
+	// Find the Day document with the given dayId
+	const day = await Day.findOne({ dayId })
+	if (!day) {
+		throw new Error("Day not found")
+	}
+
+	// Use the reduce method to add up all of the elements in hoursWorked
+	const total = day.hoursWorked.reduce((acc, cur) => acc + cur, 0)
+
+	return total
 }
