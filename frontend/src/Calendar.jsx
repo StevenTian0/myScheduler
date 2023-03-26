@@ -15,6 +15,17 @@ const styles = {
   main: {
     flexGrow: "1",
   },
+  addButton: {
+    position: "absolute",
+    top: "1390px",
+    left: "5px",
+    zIndex: 1000, // set a higher z-index to place it above the calendar
+    backgroundColor: "#90EE90",
+    color: "black",
+    padding: "10px",
+    borderRadius: "5px",
+    cursor: "pointer",
+  },
 };
 
 class Calendar extends Component {
@@ -36,8 +47,8 @@ class Calendar extends Component {
           return;
         }
         dp.events.add({
-          start: args.start,
-          end: args.end,
+          start: dp.visibleStart(),
+          end: dp.visibleEnd(),
           id: DayPilot.guid(),
           text: modal.result,
         });
@@ -58,6 +69,24 @@ class Calendar extends Component {
       },
     };
   }
+
+    handleAddTask = async () => {
+      const dp = this.calendar;
+      const modal = await DayPilot.Modal.prompt(
+        "Create a new task:",
+        "Task 1"
+      );
+      dp.clearSelection();
+      if (!modal.result) {
+        return;
+      }
+      dp.events.add({
+        start: dp.visibleStart(),
+        end: dp.visibleEnd(),
+        id: DayPilot.guid(),
+        text: modal.result,
+      });
+    };
 
   get calendar() {
     return this.calendarRef.current.control;
@@ -163,9 +192,12 @@ class Calendar extends Component {
               });
             }}
           />
+         <div style={styles.addButton} onClick={this.handleAddTask}>+ Add New Task</div>
         </div>
         <div style={styles.main}>
-          <DayPilotCalendar {...this.state} ref={this.calendarRef} />
+          <div style={{ position: "relative" }}>
+             <DayPilotCalendar {...this.state} ref={this.calendarRef} />
+          </div>
         </div>
       </div>
     );
