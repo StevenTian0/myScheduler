@@ -35,7 +35,7 @@ const getCategoryEnum = (value: String) => {
 }
 
 export const addTask = async (
-	_id: string,
+	taskId: string,
 	dueDate: Date,
 	lengthOfWork: number,
 	priorityValue: string,
@@ -57,7 +57,7 @@ export const addTask = async (
 
 	// Create the new task
 	const task = new Task({
-		taskId: _id,
+		taskId: taskId,
 		dueDate,
 		priority,
 		lengthOfWork,
@@ -69,16 +69,16 @@ export const addTask = async (
 	return task.save()
 }
 
-export const getTask = async (_id: string) => {
+export const getTask = async (taskId: string) => {
 	try {
-		const task = await Task.findOne({ taskId: _id })
+		const task = await Task.findOne({ taskId: taskId })
 
 		if (!task) {
 			throw new Error("Task not found")
 		}
 
 		return {
-			message: `Task with ID ${_id} retrived successfully.`,
+			message: `Task with ID ${taskId} retrived successfully.`,
 			task,
 		}
 	} catch (error) {
@@ -89,7 +89,7 @@ export const getTask = async (_id: string) => {
 export async function getAllTasks(token: string) {
 	try {
 		const user = await fetchUser(token)
-		const tasks = await Task.find({ user: user._id })
+		const tasks = await Task.find({ user: user.taskId })
 
 		if (!tasks) {
 			throw new Error("Tasks not found")
@@ -103,9 +103,9 @@ export async function getAllTasks(token: string) {
 	}
 }
 
-export async function deleteTask(_id: string) {
+export async function deleteTask(taskId: string) {
 	try {
-		const task = await Task.findOne({ taskId: _id })
+		const task = await Task.findOne({ taskId: taskId })
 
 		if (!task) {
 			throw new Error("Task not found")
@@ -140,7 +140,7 @@ export const deleteAllTasks = async (userId: string) => {
 }
 
 interface IUpdateTaskInput {
-	_id: string
+	taskId: string
 	token: string
 	newDueDate?: Date
 	newLengthOfWork?: number
@@ -150,7 +150,7 @@ interface IUpdateTaskInput {
 }
 
 export const updateTask = async ({
-	_id,
+	taskId,
 	token,
 	newDueDate,
 	newLengthOfWork,
@@ -160,7 +160,7 @@ export const updateTask = async ({
 }: IUpdateTaskInput) => {
 	try {
 		// Find the task in the database
-		const task = await Task.findById(_id)
+		const task = await Task.findById(taskId)
 		if (!task) {
 			throw new Error("Task not found")
 		}

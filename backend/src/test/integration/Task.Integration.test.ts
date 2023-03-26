@@ -38,7 +38,7 @@ describe("Task API", () => {
 				).token
 
 				// Set up variables for task attributes
-				const _id = "28"
+				const taskId = "28"
 				const priority = "Urgent"
 				const dueDate = "2025-12-17T03:24:00"
 				const lengthOfWork = "5"
@@ -47,7 +47,7 @@ describe("Task API", () => {
 				console.log(token)
 
 				createTaskStub.resolves({
-					_id: _id,
+					taskId: taskId,
 					categoryValue: category,
 					dueDate: dueDate,
 					lengthOfWork: lengthOfWork,
@@ -58,7 +58,7 @@ describe("Task API", () => {
 				const res = await supertest(app)
 					.post("/api/task/add")
 					.send({
-						_id: _id,
+						taskId: taskId,
 						categoryValue: category,
 						dueDate: dueDate,
 						lengthOfWork: lengthOfWork,
@@ -77,7 +77,7 @@ describe("Task API", () => {
 				throw error
 			} finally {
 				await User.deleteOne({ email: "existinguser@example.com" })
-				await Task.deleteOne({ _id: "28" })
+				await Task.deleteOne({ taskId: "28" })
 			}
 		})
 	})
@@ -93,7 +93,7 @@ describe("Task API", () => {
 				await user.save()
 
 				const task = new Task({
-					_id: "28",
+					taskId: "28",
 					priority: Priority.URG,
 					dueDate: "2023-07-25T22:39:55.872Z",
 					lengthOfWork: 60,
@@ -107,7 +107,7 @@ describe("Task API", () => {
 				const res = await supertest(app)
 					.get("/api/task/getAtask")
 					.send({
-						_id: "28",
+						taskId: "28",
 					})
 					.expect(200)
 
@@ -116,14 +116,14 @@ describe("Task API", () => {
 				throw error
 			} finally {
 				await User.deleteOne({ email: "existinguser@example.com" })
-				await Task.deleteOne({ _id: "28" })
+				await Task.deleteOne({ taskId: "28" })
 			}
 		})
 		it("should display a task not found error when task doesn't exist", () => {
 			// Make the request to fetch a task
 			const res = supertest(app)
 				.get("/api/task/getAtask")
-				.send({ _id: "999" })
+				.send({ taskId: "999" })
 				.expect(404)
 		})
 	})
@@ -139,7 +139,7 @@ describe("Task API", () => {
 				await user.save()
 
 				const task = new Task({
-					_id: "28",
+					taskId: "28",
 					priority: Priority.URG,
 					dueDate: "2023-07-25T22:39:55.872Z",
 					lengthOfWork: 60,
@@ -153,82 +153,81 @@ describe("Task API", () => {
 				const res = await supertest(app)
 					.delete("/api/task/delete")
 					.send({
-						_id: "28",
+						taskId: "28",
 					})
 					.expect(200)
 			} catch (error) {
 				throw error
 			} finally {
 				await User.deleteOne({ email: "existinguser@example.com" })
-				// await Task.deleteOne({ _id: "28" })
+				// await Task.deleteOne({ taskId: "28" })
 			}
 		})
 		it("should display a task not found error when task doesn't exist", () => {
 			// Make the request to fetch a task
 			const res = supertest(app)
 				.delete("/api/task/delete")
-				.send({ _id: "999" })
+				.send({ taskId: "999" })
 				.expect(404)
 		})
 	})
 
 	describe("PATCH /api/task/update", () => {
-		// it("should update a task with valid input", async () => {
-		// 	try {
+		it("should update a task with valid input", async () => {
+			try {
+				const user = new User({
+					email: "existinguser@example.com",
+					username: "existinguser",
+					password: "Existingpassword123",
+				})
+				await user.save()
 
-		//         const user = new User({
-		// 			email: "existinguser@example.com",
-		// 			username: "existinguser",
-		// 			password: "Existingpassword123",
-		// 		})
-		// 		await user.save()
+				const token = (
+					await loginService({
+						username: "existinguser",
+						password: "Existingpassword123",
+					})
+				).token
 
-		//         const token = (
-		// 			await loginService({
-		// 				username: "existinguser",
-		// 				password: "Existingpassword123",
-		// 			})
-		// 		).token
+				const task = new Task({
+					taskId: "28",
+					priority: Priority.URG,
+					dueDate: "2023-07-25T22:39:55.872Z",
+					lengthOfWork: 60,
+					name: "Test Task",
+					category: Category.NA,
+					user: user,
+				})
+				await task.save()
 
-		//         const task = new Task({
-		//             _id: "28",
-		//             priority: Priority.URG,
-		//             dueDate: "2023-07-25T22:39:55.872Z",
-		//             lengthOfWork: 60,
-		//             name: "Test Task",
-		//             category: Category.NA,
-		//             user: user,
-		//             })
-		//             await task.save()
+				const taskId = "28"
+				const newDueDate = "2023-07-25T22:39:55.872Z"
+				const newLengthOfWork = "10"
+				const newName = "s"
+				const newDescription = "task"
+				const workDone = "0"
+				// Make the request to fetch a task
+				const res = await supertest(app)
+					.patch("/api/task/update")
+					.send({
+						taskId: "28",
+						token: token,
+						newDueDate: newDueDate,
+						newLengthOfWork: newLengthOfWork,
+						newName: newName,
+						newDescription: newDescription,
+						workDone: workDone,
+					})
+					.expect(200)
+				expect(res.body).to.have.property("task")
+			} catch (error) {
+				throw error
+			} finally {
+				await User.deleteOne({ email: "existinguser@example.com" })
+				await Task.deleteOne({ taskId: "28" })
+			}
+		})
 
-		//             const _id = "28"
-		//             const newDueDate = "2023-07-25T22:39:55.872Z"
-		//             const newLengthOfWork = "10"
-		//             const newName = "s"
-		//             const newDescription = "task"
-		//             const workDone = "0"
-		// 		// Make the request to fetch a task
-		// 		const res = await supertest(app)
-		// 			.patch("/api/task/update")
-		// 			.send({
-		//                 "_id" : "28",
-		// 	            "token" : token,
-		// 	            "newDueDate": newDueDate,
-		// 	            "newLengthOfWork": newLengthOfWork,
-		// 	            "newName": newName,
-		// 	            "newDescription": newDescription,
-		// 	            "workDone": workDone
-		//                 })
-		// 			.expect(200)
-		//             expect(res.body).to.have.property("task")
-
-		// 	} catch (error) {
-		// 		throw error
-		// 	}finally {
-		// 		await User.deleteOne({ email: "existinguser@example.com" })
-		//         await Task.deleteOne({ _id: "28" })
-		// 	}
-		// })
 		it("should throw error when task doesn't exist", async () => {
 			const user = new User({
 				email: "existinguser@example.com",
@@ -248,7 +247,7 @@ describe("Task API", () => {
 			const res = supertest(app)
 				.patch("/api/task/update")
 				.send({
-					_id: "28",
+					taskId: "28",
 					token: token,
 					newDueDate: "2025-12-17T03:24:00",
 					newLengthOfWork: 60,
@@ -256,7 +255,7 @@ describe("Task API", () => {
 					newDescription: "asd",
 					workDone: 2,
 				})
-				.send({ _id: "999" })
+				.send({ taskId: "999" })
 				.expect(404)
 
 			await User.deleteOne({ email: "existinguser@example.com" })
@@ -274,7 +273,7 @@ describe("Task API", () => {
 				await user.save()
 
 				const task = new Task({
-					_id: "28",
+					taskId: "28",
 					priority: Priority.URG,
 					dueDate: "2023-07-25T22:39:55.872Z",
 					lengthOfWork: 60,
@@ -288,21 +287,21 @@ describe("Task API", () => {
 				const res = await supertest(app)
 					.delete("/api/task/delete")
 					.send({
-						_id: "28",
+						taskId: "28",
 					})
 					.expect(200)
 			} catch (error) {
 				throw error
 			} finally {
 				await User.deleteOne({ email: "existinguser@example.com" })
-				// await Task.deleteOne({ _id: "28" })
+				// await Task.deleteOne({ taskId: "28" })
 			}
 		})
 		it("should display a task not found error when task doesn't exist", () => {
 			// Make the request to fetch a task
 			const res = supertest(app)
 				.delete("/api/task/delete")
-				.send({ _id: "999" })
+				.send({ taskId: "999" })
 				.expect(404)
 		})
 	})
