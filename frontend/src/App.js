@@ -7,15 +7,21 @@ import Calendar from "./Calendar";
 import Signup from "./Signup";
 import EditProfileForm from "./EditProfileForm";
 import Login from "./Login";
+import { BrowserRouter as Router, Route, Routes, Link } from "react-router-dom";
+import "./index.css";
+
 function App() {
-  //notes is a list of note components
   return (
-    <div>
-      <EditProfileForm />
-      <Login />
-      <Signup />
-      <Calendar />
-    </div>
+    <Router>
+      <div>
+        <Routes>
+          <Route exact path="/" element={<Login />} />
+          <Route path="/signup" element={<Signup />} />
+          <Route path="/edit-profile" element={<EditProfileForm />} />
+          <Route path="/calendar" element={<Calendar />} />
+        </Routes>
+      </div>
+    </Router>
   );
 }
 

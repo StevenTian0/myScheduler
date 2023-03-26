@@ -15,6 +15,7 @@ const useStyles = makeStyles((theme) => ({
     height: "100vh",
     display: "flex",
     alignItems: "center",
+    justifyContent: "center",
   },
   form: {
     backgroundColor: "white",

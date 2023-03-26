@@ -8,13 +8,17 @@ import {
   Button,
   Grid,
 } from "@material-ui/core";
+import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 const useStyles = makeStyles((theme) => ({
   container: {
     backgroundColor: "#f5f5f5",
     height: "100vh",
     display: "flex",
+    flexDirection: "column",
     alignItems: "center",
+    justifyContent: "center",
   },
   form: {
     backgroundColor: "white",
@@ -31,6 +35,7 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const Login = () => {
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     username: "",
     password: "",
@@ -52,8 +57,9 @@ const Login = () => {
         password,
       });
       const { user, token } = res.data;
-      localStorage.setItem('token', token);
+      localStorage.setItem("token", token);
       console.log("User is Logged in");
+      navigate("/calendar");
     } catch (err) {
       console.error(err.response.data);
     }
@@ -61,40 +67,45 @@ const Login = () => {
 
   return (
     <Container className={classes.container} maxWidth="lg">
-      <form onSubmit={handleSubmit} className={classes.form}>
-        <Typography variant="h5" className={classes.title}>
-          Login
+      <div>
+        <form onSubmit={handleSubmit} className={classes.form}>
+          <Typography variant="h5" className={classes.title}>
+            Login
+          </Typography>
+          <Grid container spacing={2}>
+            <Grid item xs={12}>
+              <TextField
+                fullWidth
+                label="Username"
+                type="text"
+                name="username"
+                value={username}
+                onChange={handleChange}
+                required
+              />
+            </Grid>
+            <Grid item xs={12}>
+              <TextField
+                fullWidth
+                label="Password"
+                type="password"
+                name="password"
+                value={password}
+                onChange={handleChange}
+                required
+              />
+            </Grid>
+            <Grid item xs={12}>
+              <Button variant="contained" color="primary" type="submit">
+                Login
+              </Button>
+            </Grid>
+          </Grid>
+        </form>
+        <Typography variant="body2" className={classes.signupText}>
+          Don't have an account? <Link to="/signup">Click here to sign up</Link>
         </Typography>
-        <Grid container spacing={2}>
-          <Grid item xs={12}>
-            <TextField
-              fullWidth
-              label="Username"
-              type="text"
-              name="username"
-              value={username}
-              onChange={handleChange}
-              required
-            />
-          </Grid>
-          <Grid item xs={12}>
-            <TextField
-              fullWidth
-              label="Password"
-              type="password"
-              name="password"
-              value={password}
-              onChange={handleChange}
-              required
-            />
-          </Grid>
-          <Grid item xs={12}>
-            <Button variant="contained" color="primary" type="submit">
-              Login
-            </Button>
-          </Grid>
-        </Grid>
-      </form>
+      </div>
     </Container>
   );
 };
