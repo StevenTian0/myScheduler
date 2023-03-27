@@ -14,7 +14,7 @@ const customStyles = {
 
 Modal.setAppElement("#root");
 
-function AddTask(props) {
+function AddBlocker(props) {
   const [modalIsOpen, setModalIsOpen] = useState(false);
   const [taskStart, setTaskStart] = useState("");
   const [taskEnd, setTaskEnd] = useState("");
@@ -86,7 +86,7 @@ function AddTask(props) {
     const adjustedEnd = new Date(
       new Date(taskEnd).getTime() - offsetInMilliseconds
     );
-    const duration = adjustedEnd.getTime() - adjustedStart.getTime();
+    const duration = (adjustedEnd.getTime() - adjustedStart.getTime()) / 60000;
 
     let taskId = "";
     if (type === "Task") {
@@ -203,4 +203,4 @@ function AddTask(props) {
   );
 }
 
-export default AddTask;
+export default AddBlocker;

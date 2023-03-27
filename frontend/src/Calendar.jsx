@@ -9,7 +9,7 @@ import { Link } from "react-router-dom";
 
 import axios from "axios";
 
-import AddTask from "./AddTask";
+import AddBlocker from "./AddBlocker";
 
 const styles = {
   wrap: {
@@ -186,7 +186,7 @@ class Calendar extends Component {
             <button>Go to Task List</button>
           </Link>
           <DayPilotCalendar {...this.state} ref={this.calendarRef} />
-          <AddTask onSubmit={this.handleAddBlocker} />
+          <AddBlocker onSubmit={this.handleAddBlocker} />
         </div>
       </div>
     );
