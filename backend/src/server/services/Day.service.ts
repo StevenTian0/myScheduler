@@ -99,3 +99,12 @@ export const getTotalHoursWorked = async (dayId: string): Promise<number> => {
 
 	return total
 }
+
+export const getAllTasks = async (dayId: string) => {
+	const day = await Day.findOne({ dayId })
+	if (!day) {
+		throw new Error("Day not found")
+	}
+	const tasks = await Task.find({ taskId: { $in: day.tasksWorked } })
+	return tasks
+}
