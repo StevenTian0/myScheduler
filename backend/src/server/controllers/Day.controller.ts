@@ -6,6 +6,7 @@ import {
 	getDayById,
 	updateDay,
 	getTotalHoursWorked,
+	getAllTasks,
 } from "../services/Day.service"
 
 export const createDayController = async (req: Request, res: Response) => {
@@ -37,7 +38,7 @@ export const createEmptyDayController = async (req: Request, res: Response) => {
 
 export const getDayByIdController = async (req: Request, res: Response) => {
 	try {
-		const { dayId } = req.body
+		const { dayId } = req.params
 		const day = await getDayById(dayId)
 
 		res.status(200).json(day)
@@ -63,7 +64,7 @@ export const updateDayController = async (req: Request, res: Response) => {
 
 export const deleteDayController = async (req: Request, res: Response) => {
 	try {
-		const { dayId } = req.body
+		const { dayId } = req.params
 		const deletedDay = await deleteDay(dayId)
 
 		res.status(200).json({ message: "Day deleted successfully", deletedDay })
@@ -77,9 +78,19 @@ export const getTotalHoursWorkedController = async (
 	res: Response
 ) => {
 	try {
-		const { dayId } = req.body
+		const { dayId } = req.params
 		const total = await getTotalHoursWorked(dayId)
 		res.status(200).json({ total })
+	} catch (error: any) {
+		res.status(400).json({ error: error.message })
+	}
+}
+
+export const getAllTasksController = async (req: Request, res: Response) => {
+	try {
+		const { dayId } = req.params
+		const tasks = await getAllTasks(dayId)
+		res.status(200).json({ tasks })
 	} catch (error: any) {
 		res.status(400).json({ error: error.message })
 	}

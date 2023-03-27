@@ -6,13 +6,19 @@ import {
 	updateBlockerTimeController,
 	updateBlockerDurationController,
 	updateBlockerNameAndDescriptionController,
+	updateBlockerTaskController,
+	getByTimeController,
+	getTaskIdController,
 } from "../controllers/Blocker.controller"
 
 const blockerRouter = Router()
 
 blockerRouter.post("/api/blocker/add", addBlockerController)
-blockerRouter.delete("/api/blocker/delete", deleteBlockerController)
-blockerRouter.get("/api/blockers/getAll", getAllBlockersController)
+blockerRouter.delete(
+	"/api/blocker/delete/:token/:time",
+	deleteBlockerController
+)
+blockerRouter.get("/api/blockers/getAll/:token", getAllBlockersController)
 blockerRouter.patch("/api/blockers/updateTime", updateBlockerTimeController)
 blockerRouter.patch(
 	"/api/blockers/updateDuration",
@@ -22,5 +28,8 @@ blockerRouter.patch(
 	"/api/blockers/updateNameAndDescription",
 	updateBlockerNameAndDescriptionController
 )
+blockerRouter.patch("/api/blockers/updateTask", updateBlockerTaskController)
+blockerRouter.get("/api/blockers/getByTime/:token/:time", getByTimeController)
+blockerRouter.get("/api/blockers/getTaskId/:token/:time", getTaskIdController)
 
 export default blockerRouter

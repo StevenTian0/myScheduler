@@ -67,7 +67,7 @@ export const updateController = async (req: Request, res: Response) => {
 
 export const deleteController = async (req: Request, res: Response) => {
 	try {
-		const { taskId } = req.body
+		const { taskId } = req.params
 		const result = await deleteTask(taskId)
 
 		res.status(200).json(result)
@@ -78,7 +78,7 @@ export const deleteController = async (req: Request, res: Response) => {
 
 export const getController = async (req: Request, res: Response) => {
 	try {
-		const { taskId } = req.body
+		const taskId = req.params.taskId
 
 		const task = await getTask(taskId)
 
@@ -90,7 +90,7 @@ export const getController = async (req: Request, res: Response) => {
 
 export const getAllController = async (req: Request, res: Response) => {
 	try {
-		const { token } = req.body
+		const token = req.params.token
 		const tasks = await getAllTasks(token)
 
 		res.status(200).json(tasks)
