@@ -5,6 +5,7 @@ import {
   DayPilotCalendar,
   DayPilotNavigator,
 } from "@daypilot/daypilot-lite-react";
+import { Link } from "react-router-dom";
 
 import axios from "axios";
 
@@ -174,6 +175,9 @@ class Calendar extends Component {
           />
         </div>
         <div style={styles.main}>
+          <Link to="/tasklist">
+            <button>Go to Task List</button>
+          </Link>
           <DayPilotCalendar {...this.state} ref={this.calendarRef} />
           <AddTask onSubmit={this.handleAddTask} />
         </div>

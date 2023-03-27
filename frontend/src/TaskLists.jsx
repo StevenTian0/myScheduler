@@ -12,6 +12,7 @@ import {
   IconButton,
 } from "@material-ui/core";
 import { KeyboardArrowDown, KeyboardArrowUp } from "@material-ui/icons";
+import { Link } from "react-router-dom";
 
 const TaskList = () => {
   const [tasks, setTasks] = useState(null);
@@ -75,6 +76,9 @@ const TaskList = () => {
   return (
     <div>
       <button onClick={loadTasks}>Load Tasks</button>
+      <Link to="/calendar">
+        <button>Go to Calendar</button>
+      </Link>
       <TableContainer component={Paper}>
         <Table>
           <TableHead>
