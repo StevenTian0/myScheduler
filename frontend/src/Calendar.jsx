@@ -6,6 +6,8 @@ import {
   DayPilotNavigator,
 } from "@daypilot/daypilot-lite-react";
 
+import axios from "axios";
+
 import AddTask from "./AddTask";
 
 const styles = {
@@ -83,7 +85,47 @@ class Calendar extends Component {
     };
   }
 
-  handleAddTask = (task) => {
+  getAllTasks = async () => {
+    try {
+      const userToken = localStorage.getItem("token"); // Replace this with the actual token
+      const response = await axios.post(
+        "/api/task/getAllTasks",
+        {
+          token: userToken,
+        },
+        {
+          headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+        }
+      );
+
+      const tasks = response.data.tasks.map((task) => ({
+        start: new Date(
+          task.dueDate - task.lengthOfWork * 60 * 1000
+        ).toISOString(),
+        end: new Date(task.dueDate).toISOString(),
+        id: task.taskId,
+        text: task.name,
+        description: task.description,
+        category: task.category,
+        priority: task.priority,
+        backColor:
+          task.priority === "high"
+            ? "red"
+            : task.priority === "medium"
+            ? "orange"
+            : "green",
+      }));
+      this.calendar.update({ events: tasks });
+    } catch (error) {
+      console.error("Error fetching tasks:", error);
+    }
+  };
+
+  updateCalendar = async () => {
+    await this.getAllTasks();
+  };
+
+  handleAddTask = async (task) => {
     const dp = this.calendar;
     const { text, start, end, description, category, priority } = task;
     const id = DayPilot.guid();
@@ -103,6 +145,7 @@ class Calendar extends Component {
     console.log("New task added: ", newTask);
     console.log(dp.events);
     this.setState({ isModalOpen: false });
+    await this.updateCalendar();
   };
 
   get calendar() {
@@ -110,28 +153,7 @@ class Calendar extends Component {
   }
 
   componentDidMount() {
-    //need to add start and end times to appear in calendar
-    // name field is "text"
-    // task_id is id
-    const events = [
-      {
-        id: 1,
-        start: "2023-03-07T10:30:00",
-        end: "2023-03-07T13:00:00",
-        text: "ECSE 428 HW",
-        description: "Complete backlog",
-        user_email: "archi@mail.com",
-        work_done: 3,
-        length_of_work: 10,
-        category: "Homework",
-        priority: "high",
-        //ybackColor: "red",
-      },
-    ];
-
-    const startDate = "2023-03-07";
-
-    this.calendar.update({ startDate, events });
+    this.updateCalendar();
   }
 
   render() {
