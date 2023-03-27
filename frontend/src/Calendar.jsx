@@ -153,6 +153,13 @@ class Calendar extends Component {
       console.log(response.data);
     } catch (error) {
       console.error("Error adding blocker:", error);
+
+      let errorMessage = "An error occurred while adding the blocker.";
+      if (error.response && error.response.data && error.response.data.error) {
+        errorMessage = error.response.data.error;
+      }
+
+      throw new Error(errorMessage);
     }
   };
 

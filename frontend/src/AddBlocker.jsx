@@ -23,6 +23,7 @@ function AddBlocker(props) {
   const [selectedTask, setSelectedTask] = useState("");
   const [tasks, setTasks] = useState([]);
   const [taskText, setTaskText] = useState("");
+  const [errorDescription, setErrorDescription] = useState("");
 
   function openModal() {
     fetchTasks();
@@ -77,7 +78,7 @@ function AddBlocker(props) {
     }
   }
 
-  function handleFormSubmit(e) {
+  async function handleFormSubmit(e) {
     e.preventDefault();
     const offsetInMilliseconds = 5 * 60 * 60 * 1000; // 5 hours in milliseconds
     const adjustedStart = new Date(
@@ -111,14 +112,19 @@ function AddBlocker(props) {
     };
     console.log(newBlock);
 
-    props.onSubmit(newBlock);
-    setModalIsOpen(false);
-    setTaskStart("");
-    setTaskEnd("");
-    setTaskText("");
-    setTaskDescription("");
-    setType("");
-    setSelectedTask("");
+    try {
+      await props.onSubmit(newBlock);
+      setModalIsOpen(false);
+      setTaskStart("");
+      setTaskEnd("");
+      setTaskText("");
+      setTaskDescription("");
+      setType("");
+      setSelectedTask("");
+      setErrorDescription("");
+    } catch (error) {
+      setErrorDescription(error.message);
+    }
   }
 
   return (
@@ -142,7 +148,6 @@ function AddBlocker(props) {
             />
           </label>
           <br />
-          <br />
           <label>
             Type:
             <select value={type} onChange={handleTypeChange}>
@@ -152,18 +157,19 @@ function AddBlocker(props) {
             </select>
           </label>
           <br />
-          <br />
-          <label>
-            Select Task:
-            <select value={selectedTask} onChange={handleTaskSelectChange}>
-              <option value="">-- Select Task --</option>
-              {tasks.map((task) => (
-                <option key={task.id} value={task.name}>
-                  {task.name}
-                </option>
-              ))}
-            </select>
-          </label>
+          {type === "Task" && (
+            <label>
+              Select Task:
+              <select value={selectedTask} onChange={handleTaskSelectChange}>
+                <option value="">-- Select Task --</option>
+                {tasks.map((task) => (
+                  <option key={task.id} value={task.name}>
+                    {task.name}
+                  </option>
+                ))}
+              </select>
+            </label>
+          )}
           <br />
           <br />
           <label>
@@ -192,11 +198,15 @@ function AddBlocker(props) {
             ></textarea>
           </label>
           <br />
-          <br />
           <button type="submit">Add</button>
           <button type="button" onClick={closeModal}>
             Cancel
           </button>
+          <br />
+          <label>
+            ErrorMessage:
+            <textarea value={errorDescription}></textarea>
+          </label>
         </form>
       </Modal>
     </>
