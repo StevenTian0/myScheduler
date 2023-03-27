@@ -7,6 +7,7 @@ const BlockerSchema: Schema = new Schema({
 	name: { type: String, required: true },
 	description: { type: String, required: true },
 	user: { type: mongoose.Types.ObjectId, ref: "User" },
+	task: { type: String, default: "" },
 })
 
 // Export the Blocker model using Mongoose's model method
