@@ -11,6 +11,8 @@ export const addBlocker = async (
 	task?: string
 ) => {
 	try {
+		console.log("Received time:", time)
+		time = new Date(time)
 		time = new Date(time)
 		if (time < new Date()) {
 			throw new Error("Cannot create a blocker in the past.")

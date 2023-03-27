@@ -15,6 +15,7 @@ import {
 export const addBlockerController = async (req: Request, res: Response) => {
 	try {
 		const { token, time, duration, name, description, task } = req.body
+		console.log("Received request body:", req.body)
 		const blocker = await addBlocker(
 			token,
 			time,

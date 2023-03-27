@@ -86,67 +86,82 @@ class Calendar extends Component {
     };
   }
 
-  getAllTasks = async () => {
-    try {
-      const userToken = localStorage.getItem("token"); // Replace this with the actual token
-      const response = await axios.post(
-        "/api/task/getAllTasks",
-        {
-          token: userToken,
-        },
-        {
-          headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
-        }
-      );
+  // getAllTasks = async () => {
+  //   try {
+  //     const userToken = localStorage.getItem("token"); // Replace this with the actual token
+  //     const response = await axios.post(
+  //       "/api/task/getAllTasks",
+  //       {
+  //         token: userToken,
+  //       },
+  //       {
+  //         headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+  //       }
+  //     );
 
-      const tasks = response.data.tasks.map((task) => ({
-        start: new Date(
-          task.dueDate - task.lengthOfWork * 60 * 1000
-        ).toISOString(),
-        end: new Date(task.dueDate).toISOString(),
-        id: task.taskId,
-        text: task.name,
-        description: task.description,
-        category: task.category,
-        priority: task.priority,
-        backColor:
-          task.priority === "high"
-            ? "red"
-            : task.priority === "medium"
-            ? "orange"
-            : "green",
-      }));
-      this.calendar.update({ events: tasks });
-    } catch (error) {
-      console.error("Error fetching tasks:", error);
-    }
-  };
+  //     const tasks = response.data.tasks.map((task) => ({
+  //       start: new Date(
+  //         task.dueDate - task.lengthOfWork * 60 * 1000
+  //       ).toISOString(),
+  //       end: new Date(task.dueDate).toISOString(),
+  //       id: task.taskId,
+  //       text: task.name,
+  //       description: task.description,
+  //       category: task.category,
+  //       priority: task.priority,
+  //       backColor:
+  //         task.priority === "high"
+  //           ? "red"
+  //           : task.priority === "medium"
+  //           ? "orange"
+  //           : "green",
+  //     }));
+  //     this.calendar.update({ events: tasks });
+  //   } catch (error) {
+  //     console.error("Error fetching tasks:", error);
+  //   }
+  // };
 
-  updateCalendar = async () => {
-    await this.getAllTasks();
-  };
+  // updateCalendar = async () => {
+  //   await this.getAllTasks();
+  // };
 
-  handleAddTask = async (task) => {
+  handleAddBlocker = async (newBlock) => {
     const dp = this.calendar;
-    const { text, start, end, description, category, priority } = task;
-    const id = DayPilot.guid();
-    const eventColor =
-      priority === "high" ? "red" : priority === "medium" ? "orange" : "green";
-    const newTask = {
-      start: new Date(start).toISOString(),
-      end: new Date(end).toISOString(),
-      id,
-      text: text,
-      description: description,
-      category: category,
-      priority: priority,
-      backColor: eventColor,
+    const { name, start, description, taskid, duration } = newBlock;
+
+    const token = localStorage.getItem("token");
+
+    console.log("Token:", token);
+    console.log("Start", start);
+    console.log("Duration:", duration);
+    console.log("name:", name);
+    console.log("description:", description);
+    console.log("taskId:", taskid);
+    // Prepare the data to send to the backend
+    const blockerData = {
+      token,
+      start,
+      duration,
+      name,
+      description,
+      taskid,
     };
-    dp.events.add(newTask);
-    console.log("New task added: ", newTask);
-    console.log(dp.events);
-    this.setState({ isModalOpen: false });
-    await this.updateCalendar();
+
+    try {
+      // Replace '/api/blocker/add' with the correct API endpoint if needed
+      const response = await axios.post("/api/blocker/add", blockerData);
+      console.log(response.data);
+      if (response.status === 200) {
+        console.log("Blocker added successfully");
+        // Update the calendar to display the newly added blocker
+        //await this.updateCalendar();
+      } else {
+        console.error("Error adding blocker:", response.data);
+      }
+    } catch (error) {
+      console.error("Error adding blocker:", error);
+    }
   };
 
   get calendar() {
@@ -154,7 +169,7 @@ class Calendar extends Component {
   }
 
   componentDidMount() {
-    this.updateCalendar();
+    //this.updateCalendar();
   }
 
   render() {
@@ -179,7 +194,7 @@ class Calendar extends Component {
             <button>Go to Task List</button>
           </Link>
           <DayPilotCalendar {...this.state} ref={this.calendarRef} />
-          <AddTask onSubmit={this.handleAddTask} />
+          <AddTask onSubmit={this.handleAddBlocker} />
         </div>
       </div>
     );

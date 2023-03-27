@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import Modal from "react-modal";
-
+import axios from "axios";
 const customStyles = {
   content: {
     top: "50%",
@@ -16,15 +16,31 @@ Modal.setAppElement("#root");
 
 function AddTask(props) {
   const [modalIsOpen, setModalIsOpen] = useState(false);
-  const [taskText, setTaskText] = useState("");
   const [taskStart, setTaskStart] = useState("");
   const [taskEnd, setTaskEnd] = useState("");
   const [taskDescription, setTaskDescription] = useState("");
-  const [taskCategory, setTaskCategory] = useState("");
-  const [taskPriority, setTaskPriority] = useState("");
+  const [type, setType] = useState("");
+  const [selectedTask, setSelectedTask] = useState("");
+  const [tasks, setTasks] = useState([]);
+  const [taskText, setTaskText] = useState("");
 
   function openModal() {
+    fetchTasks();
     setModalIsOpen(true);
+  }
+
+  async function fetchTasks() {
+    // Fetch tasks from the database here.
+    // Replace the URL with the actual API endpoint.
+
+    const token = localStorage.getItem("token");
+    const response = await axios.get(`/api/task/getAll/${token}`);
+
+    if (Array.isArray(response.data.tasks)) {
+      setTasks(response.data.tasks);
+    } else {
+      console.error("Invalid response data:", response.data);
+    }
   }
 
   function closeModal() {
@@ -47,12 +63,18 @@ function AddTask(props) {
     setTaskDescription(e.target.value);
   }
 
-  function handleTaskCategoryChange(e) {
-    setTaskCategory(e.target.value);
+  function handleTypeChange(e) {
+    setType(e.target.value);
   }
 
-  function handleTaskPriorityChange(e) {
-    setTaskPriority(e.target.value);
+  function handleTaskSelectChange(e) {
+    setSelectedTask(e.target.value);
+    const selectedTask = tasks.find((task) => task.name === e.target.value);
+    if (selectedTask) {
+      setTaskDescription(selectedTask.description);
+    } else {
+      setTaskDescription("");
+    }
   }
 
   function handleFormSubmit(e) {
@@ -64,36 +86,52 @@ function AddTask(props) {
     const adjustedEnd = new Date(
       new Date(taskEnd).getTime() - offsetInMilliseconds
     );
-    const newTask = {
-      text: taskText,
-      start: adjustedStart,
-      end: adjustedEnd,
+    const duration = adjustedEnd.getTime() - adjustedStart.getTime();
+
+    let taskId = "";
+    if (type == "Task") {
+      let task = tasks.find((task) => task.name === selectedTask);
+      taskId = task.taskId;
+    }
+
+    const adjustedStartFormatted = adjustedStart.toISOString();
+    // console.log("Type:", type);
+    // console.log("TaskId:", taskId);
+    // console.log("Duration:", duration);
+    // console.log("name:", taskText);
+    // console.log("description:", taskDescription);
+    // console.log("Adjusted Start Formatted:", adjustedStartFormatted);
+
+    const newBlock = {
+      name: taskText,
+      start: adjustedStartFormatted,
       description: taskDescription,
-      category: taskCategory,
-      priority: taskPriority,
+      duration: duration,
+      taskid: taskId,
       id: Date.now(),
     };
-    props.onSubmit(newTask);
+    props.onSubmit(newBlock);
     setModalIsOpen(false);
-    setTaskText("");
     setTaskStart("");
     setTaskEnd("");
+    setTaskText("");
     setTaskDescription("");
-    setTaskCategory("");
-    setTaskPriority("");
+    setType("");
+    setSelectedTask("");
   }
 
   return (
     <>
-      <button onClick={openModal}>Add Task</button>
+      <button onClick={openModal}>Add Blocker</button>
       <Modal
         isOpen={modalIsOpen}
         onRequestClose={closeModal}
         style={customStyles}
         contentLabel="Add Task Modal"
       >
-        <h2>Add a New Task</h2>
+        <h2>Add a New Blocker/Schedule</h2>
         <form onSubmit={handleFormSubmit}>
+          <br />
           <label>
             Task Name:
             <input
@@ -102,6 +140,30 @@ function AddTask(props) {
               onChange={handleTaskTextChange}
             />
           </label>
+          <br />
+          <br />
+          <label>
+            Type:
+            <select value={type} onChange={handleTypeChange}>
+              <option value="">-- Select Type --</option>
+              <option value="Blcoker">blocker</option>
+              <option value="Task">task</option>
+            </select>
+          </label>
+          <br />
+          <br />
+          <label>
+            Select Task:
+            <select value={selectedTask} onChange={handleTaskSelectChange}>
+              <option value="">-- Select Task --</option>
+              {tasks.map((task) => (
+                <option key={task.id} value={task.name}>
+                  {task.name}
+                </option>
+              ))}
+            </select>
+          </label>
+          <br />
           <br />
           <label>
             Start Time:
@@ -129,24 +191,6 @@ function AddTask(props) {
             ></textarea>
           </label>
           <br />
-          <label>
-            Category:
-            <input
-              type="text"
-              value={taskCategory}
-              onChange={handleTaskCategoryChange}
-            />
-          </label>
-          <br />
-          <label>
-            Priority:
-            <select value={taskPriority} onChange={handleTaskPriorityChange}>
-              <option value="">-- Select Priority --</option>
-              <option value="high">High</option>
-              <option value="medium">Medium</option>
-              <option value="low">Low</option>
-            </select>
-          </label>
           <br />
           <button type="submit">Add</button>
           <button type="button" onClick={closeModal}>
