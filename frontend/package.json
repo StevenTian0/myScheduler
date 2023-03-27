@@ -14,6 +14,7 @@
     "@mantine/form": "^6.0.4",
     "@mantine/hooks": "^6.0.4",
     "@material-ui/core": "^4.12.4",
+    "@material-ui/icons": "^4.11.3",
     "@mui/material": "^5.11.7",
     "@tabler/icons": "^2.11.0",
     "@testing-library/jest-dom": "^5.16.5",

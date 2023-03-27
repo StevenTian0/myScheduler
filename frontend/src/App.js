@@ -9,6 +9,7 @@ import EditProfileForm from "./EditProfileForm";
 import Login from "./Login";
 import { BrowserRouter as Router, Route, Routes, Link } from "react-router-dom";
 import "./index.css";
+import TaskList from "./TaskLists";
 
 function App() {
   return (
@@ -16,6 +17,7 @@ function App() {
       <div>
         <Routes>
           <Route exact path="/" element={<Login />} />
+          <Route path="/tasklist" element={<TaskList />} />
           <Route path="/signup" element={<Signup />} />
           <Route path="/edit-profile" element={<EditProfileForm />} />
           <Route path="/calendar" element={<Calendar />} />
