@@ -37,7 +37,7 @@ export const createEmptyDayController = async (req: Request, res: Response) => {
 
 export const getDayByIdController = async (req: Request, res: Response) => {
 	try {
-		const { dayId } = req.body
+		const { dayId } = req.params
 		const day = await getDayById(dayId)
 
 		res.status(200).json(day)
@@ -63,7 +63,7 @@ export const updateDayController = async (req: Request, res: Response) => {
 
 export const deleteDayController = async (req: Request, res: Response) => {
 	try {
-		const { dayId } = req.body
+		const { dayId } = req.params
 		const deletedDay = await deleteDay(dayId)
 
 		res.status(200).json({ message: "Day deleted successfully", deletedDay })
@@ -77,7 +77,7 @@ export const getTotalHoursWorkedController = async (
 	res: Response
 ) => {
 	try {
-		const { dayId } = req.body
+		const { dayId } = req.params
 		const total = await getTotalHoursWorked(dayId)
 		res.status(200).json({ total })
 	} catch (error: any) {

@@ -11,10 +11,10 @@ import {
 const dayRouter = Router()
 
 dayRouter.post("/api/day/create", createDayController)
-dayRouter.post("/api/day/createEmpty", createEmptyDayController)
-dayRouter.get("/api/day/getById", getDayByIdController)
-dayRouter.get("/api/day/getTotalHours", getTotalHoursWorkedController)
-dayRouter.patch("/api/day/update", updateDayController)
-dayRouter.delete("/api/day/delete", deleteDayController)
+dayRouter.post("/api/day/createEmpty/:_id/:user", createEmptyDayController)
+dayRouter.get("/api/day/getById/:dayId", getDayByIdController)
+dayRouter.get("/api/day/getTotalHours/:dayId", getTotalHoursWorkedController)
+dayRouter.patch("/api/day/update/", updateDayController)
+dayRouter.delete("/api/day/delete/:dayId", deleteDayController)
 
 export default dayRouter
