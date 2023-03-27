@@ -127,7 +127,6 @@ class Calendar extends Component {
   // };
 
   handleAddBlocker = async (newBlock) => {
-    const dp = this.calendar;
     const { name, start, description, taskid, duration } = newBlock;
 
     const token = localStorage.getItem("token");
@@ -141,24 +140,17 @@ class Calendar extends Component {
     // Prepare the data to send to the backend
     const blockerData = {
       token,
-      start,
+      time: start,
       duration,
       name,
       description,
-      taskid,
+      task: taskid,
     };
 
     try {
       // Replace '/api/blocker/add' with the correct API endpoint if needed
       const response = await axios.post("/api/blocker/add", blockerData);
       console.log(response.data);
-      if (response.status === 200) {
-        console.log("Blocker added successfully");
-        // Update the calendar to display the newly added blocker
-        //await this.updateCalendar();
-      } else {
-        console.error("Error adding blocker:", response.data);
-      }
     } catch (error) {
       console.error("Error adding blocker:", error);
     }

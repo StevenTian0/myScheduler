@@ -89,7 +89,7 @@ function AddTask(props) {
     const duration = adjustedEnd.getTime() - adjustedStart.getTime();
 
     let taskId = "";
-    if (type == "Task") {
+    if (type === "Task") {
       let task = tasks.find((task) => task.name === selectedTask);
       taskId = task.taskId;
     }
@@ -108,8 +108,9 @@ function AddTask(props) {
       description: taskDescription,
       duration: duration,
       taskid: taskId,
-      id: Date.now(),
     };
+    console.log(newBlock);
+
     props.onSubmit(newBlock);
     setModalIsOpen(false);
     setTaskStart("");
