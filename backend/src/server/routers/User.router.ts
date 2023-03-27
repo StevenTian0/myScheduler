@@ -11,10 +11,10 @@ import {
 const userRouter = Router()
 
 userRouter.post("/api/user/signUp", signUpController)
-userRouter.delete("/api/user/delete", deleteUserAccount)
+userRouter.delete("/api/user/delete/:token", deleteUserAccount)
 userRouter.post("/api/user/login", loginController)
 userRouter.patch("/api/user/update", updateUserController)
-userRouter.patch("/api/user/toggleColor", toggleColorUserController)
-userRouter.get("/api/user/getScore", getUserScoreController)
+userRouter.patch("/api/user/toggleColor/:token", toggleColorUserController)
+userRouter.get("/api/user/getScore/:token", getUserScoreController)
 
 export default userRouter

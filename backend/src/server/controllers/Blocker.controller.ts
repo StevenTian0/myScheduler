@@ -7,12 +7,23 @@ import {
 	updateBlockerDuration,
 	updateBlockerTime,
 	updateBlockerNameAndDescription,
+	updateBlockerTask,
+	getByTime,
+	getTaskId,
+	getBetweenTimes,
 } from "../services/Blocker.service"
 
 export const addBlockerController = async (req: Request, res: Response) => {
 	try {
-		const { token, time, duration, name, description } = req.body
-		const blocker = await addBlocker(token, time, duration, name, description)
+		const { token, time, duration, name, description, task } = req.body
+		const blocker = await addBlocker(
+			token,
+			time,
+			duration,
+			name,
+			description,
+			task
+		)
 		res.status(201).json({ message: "Blocker added successfully", blocker })
 	} catch (error: any) {
 		res.status(400).json({ error: error.message })
@@ -21,7 +32,7 @@ export const addBlockerController = async (req: Request, res: Response) => {
 
 export const deleteBlockerController = async (req: Request, res: Response) => {
 	try {
-		const { token, time } = req.body
+		const { token, time } = req.params
 		const result = await deleteBlocker(token, new Date(time))
 		res.status(200).json(result)
 	} catch (error: any) {
@@ -31,7 +42,7 @@ export const deleteBlockerController = async (req: Request, res: Response) => {
 
 export const getAllBlockersController = async (req: Request, res: Response) => {
 	try {
-		const { token } = req.body
+		const { token } = req.params
 		const result = await getAllBlockers(token)
 		res.status(200).json(result)
 	} catch (error: any) {
@@ -84,6 +95,56 @@ export const updateBlockerNameAndDescriptionController = async (
 			new Date(time),
 			name,
 			description
+		)
+		res.status(200).json(result)
+	} catch (error: any) {
+		res.status(400).json({ error: error.message })
+	}
+}
+
+export const updateBlockerTaskController = async (
+	req: Request,
+	res: Response
+) => {
+	try {
+		const { token, time, task } = req.body
+		const result = await updateBlockerTask(token, new Date(time), task)
+		res.status(200).json(result)
+	} catch (error: any) {
+		res.status(400).json({ error: error.message })
+	}
+}
+
+export const getByTimeController = async (req: Request, res: Response) => {
+	try {
+		const { token, time } = req.params
+		const result = await getByTime(token, new Date(time))
+		res.status(200).json(result)
+	} catch (error: any) {
+		res.status(400).json({ error: error.message })
+	}
+}
+
+export const getTaskIdController = async (req: Request, res: Response) => {
+	try {
+		const { token, time } = req.params
+		const result = await getTaskId(token, new Date(time))
+		res.status(200).json(result)
+	} catch (error: any) {
+		res.status(400).json({ error: error.message })
+	}
+}
+
+export const getBetweenTimesController = async (
+	req: Request,
+	res: Response
+) => {
+	try {
+		const { token, startTime, endTime } = req.params
+		const result = await getBetweenTimes(
+			token,
+			new Date(startTime),
+			new Date(endTime)
 		)
 		res.status(200).json(result)
 	} catch (error: any) {

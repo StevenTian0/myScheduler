@@ -1,12 +1,14 @@
 // Service to add a blocker with time conflict check
 import { fetchUser } from "./User.service"
 import Blocker from "../models/Blocker.model"
+
 export const addBlocker = async (
 	token: string,
 	time: Date,
 	duration: number,
 	name?: string,
-	description?: string
+	description?: string,
+	task?: string
 ) => {
 	try {
 		time = new Date(time)
@@ -33,6 +35,7 @@ export const addBlocker = async (
 			name: name || "new Blocker",
 			description: description || "new Description",
 			user: user._id,
+			task: task || "",
 		})
 		await newBlocker.save()
 		return newBlocker
@@ -225,6 +228,92 @@ export async function updateBlockerNameAndDescription(
 		return {
 			message: "Blocker name and description updated successfully",
 			existingBlocker,
+		}
+	} catch (error) {
+		throw error
+	}
+}
+
+export async function updateBlockerTask(
+	token: string,
+	time: Date,
+	task: string
+) {
+	try {
+		const blocker = await getByTime(token, time)
+		blocker.task = task
+
+		blocker.save()
+
+		return {
+			message: "Blocker name and description updated successfully",
+			blocker,
+		}
+	} catch (error) {
+		throw error
+	}
+}
+
+export const getByTime = async (token: string, time: Date) => {
+	try {
+		const user = await fetchUser(token)
+		if (!user) {
+			throw new Error("User not found")
+		}
+
+		const existingBlocker = await Blocker.findOne({
+			user: user._id,
+			time: time,
+		})
+		if (!existingBlocker) {
+			throw new Error("Blocker not found")
+		}
+
+		return existingBlocker
+	} catch (error) {
+		throw error
+	}
+}
+
+export const getTaskId = async (token: string, time: Date) => {
+	try {
+		const blocker = await getByTime(token, time)
+
+		return blocker.task
+	} catch (error) {
+		throw error
+	}
+}
+
+export const getBetweenTimes = async (
+	token: string,
+	startTime: Date,
+	endTime: Date
+) => {
+	try {
+		const user = await fetchUser(token)
+		if (!user) {
+			throw new Error("User not found")
+		}
+
+		const blockers = await Blocker.find({
+			user: user._id,
+			$and: [
+				{ time: { $lt: endTime } },
+				{
+					$expr: {
+						$gt: [
+							{ $add: ["$time", { $multiply: ["$duration", 60000] }] },
+							startTime,
+						],
+					},
+				},
+			],
+		})
+
+		return {
+			message: "Blockers retrieved successfully",
+			blockers,
 		}
 	} catch (error) {
 		throw error

@@ -9,7 +9,7 @@ import mongoose from "mongoose"
 import userRouter from "./routers/User.router"
 import taskRouter from "./routers/Task.router"
 import blockerRouter from "./routers/Blocker.router"
-
+import dayRouter from "./routers/Day.router"
 
 dotenv.config()
 
@@ -27,6 +27,7 @@ const PORT: number = parseInt(process.env.PORT as string, 10)
 const MONGODB_URI: string = process.env.MONGODB_URI as string
 
 const app = express()
+export default app
 
 /**
  * Middleware
@@ -41,24 +42,21 @@ app.use(express.json())
 app.use(userRouter)
 app.use(taskRouter)
 app.use(blockerRouter)
+app.use(dayRouter)
 
-/**
- * Connect to MongoDB
- * Assign MongoDB as constant
- */
+// Wait for MongoDB to be connected before starting the server
+mongoose.connection.once("connected", () => {
+	var server = app.listen(PORT, () => {
+		console.log(`Started server!`)
+		console.log(`Listening on port ${PORT}`)
+	})
+})
+
 mongoose.connect(MONGODB_URI, (error) => {
 	if (error) {
 		console.error(`Failed to connect to MongoDB: ${error}`)
 		process.exit(1)
 	}
 
-	console.log("Connected to MongoDB")
-})
-
-/**
- * Start Server
- */
-app.listen(PORT, () => {
-	console.log(`Started server!`)
-	console.log(`Listening on port ${PORT}`)
+	console.log("Connecting to MongoDB")
 })

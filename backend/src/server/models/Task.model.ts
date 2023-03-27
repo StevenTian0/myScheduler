@@ -19,7 +19,7 @@ export enum Category {
 
 // Define the TaskSchema using Mongoose Schema
 const TaskSchema: Schema = new Schema({
-	_id: { type: String, required: true }, // The objectId (taskId)
+	taskId: { type: String, required: true },
 	priority: { type: String, enum: Object.values(Priority), required: true }, // The priority of the task is required
 	dueDate: { type: Date, required: true }, // The due date of the task is required
 	lengthOfWork: { type: Number, required: true }, // The length of work is required

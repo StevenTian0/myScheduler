@@ -10,7 +10,7 @@ import {
 export const addController = async (req: Request, res: Response) => {
 	try {
 		const {
-			_id,
+			taskId,
 			dueDate,
 			lengthOfWork,
 			priorityValue,
@@ -21,7 +21,7 @@ export const addController = async (req: Request, res: Response) => {
 		} = req.body
 
 		const task = await addTask(
-			_id,
+			taskId,
 			dueDate,
 			lengthOfWork,
 			priorityValue,
@@ -40,7 +40,7 @@ export const addController = async (req: Request, res: Response) => {
 export const updateController = async (req: Request, res: Response) => {
 	try {
 		const {
-			_id,
+			taskId,
 			token,
 			newDueDate,
 			newLengthOfWork,
@@ -50,7 +50,7 @@ export const updateController = async (req: Request, res: Response) => {
 		} = req.body
 
 		const task = await updateTask({
-			_id,
+			taskId,
 			token,
 			newDueDate,
 			newLengthOfWork,
@@ -67,8 +67,8 @@ export const updateController = async (req: Request, res: Response) => {
 
 export const deleteController = async (req: Request, res: Response) => {
 	try {
-		const { _id } = req.body
-		const result = await deleteTask(_id)
+		const { taskId } = req.params
+		const result = await deleteTask(taskId)
 
 		res.status(200).json(result)
 	} catch (error: any) {
@@ -78,9 +78,9 @@ export const deleteController = async (req: Request, res: Response) => {
 
 export const getController = async (req: Request, res: Response) => {
 	try {
-		const { _id } = req.body
+		const taskId = req.params.taskId
 
-		const task = await getTask(_id)
+		const task = await getTask(taskId)
 
 		res.status(200).json(task)
 	} catch (error: any) {
@@ -90,7 +90,7 @@ export const getController = async (req: Request, res: Response) => {
 
 export const getAllController = async (req: Request, res: Response) => {
 	try {
-		const { token } = req.body
+		const token = req.params.token
 		const tasks = await getAllTasks(token)
 
 		res.status(200).json(tasks)
