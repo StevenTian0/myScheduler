@@ -284,3 +284,38 @@ export const getTaskId = async (token: string, time: Date) => {
 		throw error
 	}
 }
+
+export const getBetweenTimes = async (
+	token: string,
+	startTime: Date,
+	endTime: Date
+) => {
+	try {
+		const user = await fetchUser(token)
+		if (!user) {
+			throw new Error("User not found")
+		}
+
+		const blockers = await Blocker.find({
+			user: user._id,
+			$and: [
+				{ time: { $lt: endTime } },
+				{
+					$expr: {
+						$gt: [
+							{ $add: ["$time", { $multiply: ["$duration", 60000] }] },
+							startTime,
+						],
+					},
+				},
+			],
+		})
+
+		return {
+			message: "Blockers retrieved successfully",
+			blockers,
+		}
+	} catch (error) {
+		throw error
+	}
+}

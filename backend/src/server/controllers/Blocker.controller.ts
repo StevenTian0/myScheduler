@@ -10,6 +10,7 @@ import {
 	updateBlockerTask,
 	getByTime,
 	getTaskId,
+	getBetweenTimes,
 } from "../services/Blocker.service"
 
 export const addBlockerController = async (req: Request, res: Response) => {
@@ -128,6 +129,23 @@ export const getTaskIdController = async (req: Request, res: Response) => {
 	try {
 		const { token, time } = req.params
 		const result = await getTaskId(token, new Date(time))
+		res.status(200).json(result)
+	} catch (error: any) {
+		res.status(400).json({ error: error.message })
+	}
+}
+
+export const getBetweenTimesController = async (
+	req: Request,
+	res: Response
+) => {
+	try {
+		const { token, startTime, endTime } = req.params
+		const result = await getBetweenTimes(
+			token,
+			new Date(startTime),
+			new Date(endTime)
+		)
 		res.status(200).json(result)
 	} catch (error: any) {
 		res.status(400).json({ error: error.message })
