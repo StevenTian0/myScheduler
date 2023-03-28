@@ -78,39 +78,39 @@ const TaskList = () => {
     }
     };
 
-  const handleAddTask = async (newBlock) => {
-    const { name, dueDate, description, taskid, lengthOfWork, priority, category } = newBlock;
+  const handleAddTask = async (newTask) => {
+    const { name, dueDate, description, taskId, lengthOfWork, priorityValue, categoryValue } = newTask;
 
     const token = localStorage.getItem("token");
 
-    console.log("Token:", token);
-    console.log("Due Date", dueDate);
-    console.log("Length Of Work:", lengthOfWork);
-    console.log("name:", name);
-    console.log("description:", description);
-    console.log("Priority:", priority);
-    console.log("Category:", category);
-    console.log("taskId:", taskid);
+//     console.log("Token:", token);
+//     console.log("Due Date", dueDate);
+//     console.log("Length Of Work:", lengthOfWork);
+//     console.log("name:", name);
+//     console.log("description:", description);
+//     console.log("Priority:", priority);
+//     console.log("Category:", category);
+//     console.log("taskId:", taskid);
     // Prepare the data to send to the backend
-    const blockerData = {
+    const taskData = {
       token,
       dueDate,
-      priorityValue: priority,
-      categoryValue: category,
+      priorityValue,
+      categoryValue,
       name,
       description,
-      taskId: taskid,
+      taskId,
       lengthOfWork,
     };
 
     try {
       // Replace '/api/blocker/add' with the correct API endpoint if needed
-      const response = await axios.post("/api/blocker/add", blockerData);
+      const response = await axios.post("/api/task/create", taskData);
       console.log(response.data);
     } catch (error) {
-      console.error("Error adding blocker:", error);
+      console.error("Error adding task:", error);
 
-      let errorMessage = "An error occurred while adding the blocker.";
+      let errorMessage = "An error occurred while adding the task.";
       if (error.response && error.response.data && error.response.data.error) {
         errorMessage = error.response.data.error;
       }

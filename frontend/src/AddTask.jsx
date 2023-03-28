@@ -115,25 +115,27 @@ function AddTask(props) {
     // console.log("description:", taskDescription);
     // console.log("Adjusted Start Formatted:", adjustedStartFormatted);
 
-    const newBlock = {
+    const newTask = {
       name: taskText,
       dueDate: taskDueDate,
       priorityValue: priorityType,
-      categoryType: categoryType,
+      categoryValue: categoryType,
       description: taskDescription,
       lengthOfWork: taskLengthOfWork,
       taskId: taskID,
     };
-    console.log(newBlock);
+    console.log(newTask);
 
     try {
-      await props.onSubmit(newBlock);
+      await props.onSubmit(newTask);
       setModalIsOpen(false);
       setTaskDueDate("");
       setTaskLengthOfWork("");
       setTaskText("");
       setTaskDescription("");
       setPriorityType("");
+      setCategoryType("");
+      setTaskID("");
       setSelectedTask("");
       setErrorDescription("");
     } catch (error) {
