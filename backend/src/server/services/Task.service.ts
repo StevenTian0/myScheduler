@@ -121,15 +121,10 @@ export async function deleteTask(taskId: string) {
 	}
 }
 
-export const deleteAllTasks = async (userId: string) => {
+export const deleteAllTasks = async (token: string) => {
 	try {
-		const tasks = await Task.find({ user: userId })
-
-		if (!tasks) {
-			throw new Error("Tasks not found")
-		}
-
-		await Task.deleteMany({ user: userId })
+		const user = await fetchUser(token)
+		await Task.deleteMany({ user: user._id })
 
 		return {
 			message: "All tasks deleted successfully",
@@ -141,22 +136,24 @@ export const deleteAllTasks = async (userId: string) => {
 
 interface IUpdateTaskInput {
 	taskId: string
-	token: string
 	newDueDate?: Date
 	newLengthOfWork?: number
 	newName?: string
 	newDescription?: string
 	workDone?: number
+	newPriority?: string
+	newCategory?: string
 }
 
 export const updateTask = async ({
 	taskId,
-	token,
 	newDueDate,
 	newLengthOfWork,
 	newName,
 	newDescription,
 	workDone,
+	newPriority,
+	newCategory,
 }: IUpdateTaskInput) => {
 	try {
 		// Find the task in the database
@@ -193,8 +190,16 @@ export const updateTask = async ({
 			task.description = newDescription
 		}
 
-		//adding work done
+		if (newPriority) {
+			task.priority = getPrioEnum(newPriority)
+		}
+
+		if (newCategory) {
+			task.category = getCategoryEnum(newCategory)
+		}
+
 		if (workDone) {
+			//adding work done
 			if (workDone < 0) {
 				throw new Error("Task progress cannot be negative")
 			} else {

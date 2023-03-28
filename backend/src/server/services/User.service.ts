@@ -225,6 +225,11 @@ export const toggleColor = async (token: string) => {
 		} else {
 			user.uiColor = UiColor.LIGHT
 		}
+		await user.save()
+		return {
+			message: "User updated successfully",
+			user,
+		}
 	} catch (error) {
 		throw error
 	}
