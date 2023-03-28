@@ -60,6 +60,19 @@ const TaskList = () => {
     }
   };
 
+  const handleDeleteAllTasks = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      await axios.delete(`/api/task/deleteAll/${token}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setTasks(null);
+      setSelectedTask(null);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   const renderTaskRow = (task) => {
     const isExpanded = task === selectedTask;
     return (
@@ -102,6 +115,7 @@ const TaskList = () => {
   return (
     <div>
       <button onClick={loadTasks}>Load Tasks</button>
+      <button onClick={handleDeleteAllTasks}>Delete All Tasks</button>
       <Link to="/calendar">
         <button>Go to Calendar</button>
       </Link>
