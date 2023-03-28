@@ -5,24 +5,21 @@ import Blocker from "../models/Blocker.model"
 export const addBlocker = async (
 	token: string,
 	time: Date,
-	duration: number,
-	name?: string,
-	description?: string,
-	task?: string
+	duration: number = 30
 ) => {
 	try {
 		time = new Date(time)
-		if (time < new Date()) {
-			throw new Error("Cannot create a blocker in the past.")
-		}
 		const user = await fetchUser(token)
 		const existingBlockers = await Blocker.find({ user: user._id })
+
 		for (const existingBlocker of existingBlockers) {
 			const start = existingBlocker.time
 			const end = new Date(
 				start.getTime() + existingBlocker.duration * 60 * 1000
 			)
-			checkConflict(start, end, time, duration)
+			if (checkConflict(start, end, time, duration)) {
+				return await deleteBlocker(token, start)
+			}
 		}
 
 		if (duration <= 0) {
@@ -32,11 +29,9 @@ export const addBlocker = async (
 		const newBlocker = new Blocker({
 			time,
 			duration,
-			name: name || "new Blocker",
-			description: description || "new Description",
 			user: user._id,
-			task: task || "",
 		})
+
 		await newBlocker.save()
 		return newBlocker
 	} catch (error) {
@@ -76,96 +71,96 @@ export async function getAllBlockers(token: string) {
 	}
 }
 
-export async function updateBlockerTime(
-	token: string,
-	oldTime: Date,
-	newTime: Date
-) {
-	try {
-		if (newTime < new Date()) {
-			throw new Error("Cannot create a blocker in the past.")
-		}
+// export async function updateBlockerTime(
+// 	token: string,
+// 	oldTime: Date,
+// 	newTime: Date
+// ) {
+// 	try {
+// 		if (newTime < new Date()) {
+// 			throw new Error("Cannot create a blocker in the past.")
+// 		}
 
-		const user = await fetchUser(token)
-		if (!user) {
-			throw new Error("User not found")
-		}
+// 		const user = await fetchUser(token)
+// 		if (!user) {
+// 			throw new Error("User not found")
+// 		}
 
-		const existingBlocker = await Blocker.findOne({
-			user: user._id,
-			time: oldTime,
-		})
-		if (!existingBlocker) {
-			throw new Error("Blocker not found")
-		}
+// 		const existingBlocker = await Blocker.findOne({
+// 			user: user._id,
+// 			time: oldTime,
+// 		})
+// 		if (!existingBlocker) {
+// 			throw new Error("Blocker not found")
+// 		}
 
-		const duration = existingBlocker.duration
+// 		const duration = existingBlocker.duration
 
-		const existingBlockers = await Blocker.find({ user: user._id })
+// 		const existingBlockers = await Blocker.find({ user: user._id })
 
-		for (const blocker of existingBlockers) {
-			const start = blocker.time
-			const end = new Date(start.getTime() + blocker.duration * 60 * 1000)
-			if (oldTime.getTime() == start.getTime()) {
-				continue
-			}
-			checkConflict(start, end, newTime, duration)
-		}
+// 		for (const blocker of existingBlockers) {
+// 			const start = blocker.time
+// 			const end = new Date(start.getTime() + blocker.duration * 60 * 1000)
+// 			if (oldTime.getTime() == start.getTime()) {
+// 				continue
+// 			}
+// 			checkConflict(start, end, newTime, duration)
+// 		}
 
-		existingBlocker.time = newTime
-		existingBlocker.save()
-		return {
-			message: "Blocker time updated successfully",
-			existingBlocker,
-		}
-	} catch (error) {
-		throw error
-	}
-}
+// 		existingBlocker.time = newTime
+// 		existingBlocker.save()
+// 		return {
+// 			message: "Blocker time updated successfully",
+// 			existingBlocker,
+// 		}
+// 	} catch (error) {
+// 		throw error
+// 	}
+// }
 
-export async function updateBlockerDuration(
-	token: string,
-	time: Date,
-	newDuration: number
-) {
-	try {
-		if (newDuration <= 0) {
-			throw new Error("Duration must be positive")
-		}
-		const user = await fetchUser(token)
-		if (!user) {
-			throw new Error("User not found")
-		}
+// export async function updateBlockerDuration(
+// 	token: string,
+// 	time: Date,
+// 	newDuration: number
+// ) {
+// 	try {
+// 		if (newDuration <= 0) {
+// 			throw new Error("Duration must be positive")
+// 		}
+// 		const user = await fetchUser(token)
+// 		if (!user) {
+// 			throw new Error("User not found")
+// 		}
 
-		const existingBlocker = await Blocker.findOne({
-			user: user._id,
-			time: time,
-		})
-		if (!existingBlocker) {
-			throw new Error("Blocker not found")
-		}
+// 		const existingBlocker = await Blocker.findOne({
+// 			user: user._id,
+// 			time: time,
+// 		})
+// 		if (!existingBlocker) {
+// 			throw new Error("Blocker not found")
+// 		}
 
-		const existingBlockers = await Blocker.find({ user: user._id })
+// 		const existingBlockers = await Blocker.find({ user: user._id })
 
-		for (const blocker of existingBlockers) {
-			const start = blocker.time
-			const end = new Date(start.getTime() + blocker.duration * 60 * 1000)
-			if (time.getTime() == start.getTime()) {
-				continue
-			}
-			checkConflict(start, end, time, newDuration)
-		}
+// 		for (const blocker of existingBlockers) {
+// 			const start = blocker.time
+// 			const end = new Date(start.getTime() + blocker.duration * 60 * 1000)
+// 			if (time.getTime() == start.getTime()) {
+// 				continue
+// 			}
+// 			checkConflict(start, end, time, newDuration)
+// 		}
 
-		existingBlocker.duration = newDuration
-		existingBlocker.save()
-		return {
-			message: "Blocker duration updated successfully",
-			existingBlocker,
-		}
-	} catch (error) {
-		throw error
-	}
-}
+// 		existingBlocker.duration = newDuration
+// 		existingBlocker.save()
+// 		return {
+// 			message: "Blocker duration updated successfully",
+// 			existingBlocker,
+// 		}
+// 	} catch (error) {
+// 		throw error
+// 	}
+// }
 
 const checkConflict = (
 	start: Date,
@@ -176,78 +171,13 @@ const checkConflict = (
 	try {
 		const newEnd = new Date(time.getTime() + duration * 60 * 1000)
 		if (time >= start && time < end) {
-			throw new Error(
-				"Conflict with existing blocker, please choose a different time."
-			)
+			return true
 		}
 		if (newEnd > start && newEnd <= end) {
-			throw new Error(
-				"Conflict with existing blocker, please choose a different time."
-			)
+			return true
 		}
 		if (time <= start && newEnd >= end) {
-			throw new Error(
-				"Conflict with existing blocker, please choose a different time."
-			)
-		}
-	} catch (error) {
-		throw error
-	}
-}
-
-export async function updateBlockerNameAndDescription(
-	token: string,
-	time: Date,
-	name?: string,
-	description?: string
-) {
-	try {
-		const user = await fetchUser(token)
-		if (!user) {
-			throw new Error("User not found")
-		}
-
-		const existingBlocker = await Blocker.findOne({
-			user: user._id,
-			time: time,
-		})
-		if (!existingBlocker) {
-			throw new Error("Blocker not found")
-		}
-
-		if (name) {
-			existingBlocker.name = name
-		}
-
-		if (description) {
-			existingBlocker.description = description
-		}
-
-		existingBlocker.save()
-
-		return {
-			message: "Blocker name and description updated successfully",
-			existingBlocker,
-		}
-	} catch (error) {
-		throw error
-	}
-}
-
-export async function updateBlockerTask(
-	token: string,
-	time: Date,
-	task: string
-) {
-	try {
-		const blocker = await getByTime(token, time)
-		blocker.task = task
-
-		blocker.save()
-
-		return {
-			message: "Blocker name and description updated successfully",
-			blocker,
+			return true
 		}
 	} catch (error) {
 		throw error
@@ -270,16 +200,6 @@ export const getByTime = async (token: string, time: Date) => {
 		}
 
 		return existingBlocker
-	} catch (error) {
-		throw error
-	}
-}
-
-export const getTaskId = async (token: string, time: Date) => {
-	try {
-		const blocker = await getByTime(token, time)
-
-		return blocker.task
 	} catch (error) {
 		throw error
 	}
