@@ -10,6 +10,7 @@ import {
   Paper,
   Collapse,
   IconButton,
+  Button,
 } from "@material-ui/core";
 import { KeyboardArrowDown, KeyboardArrowUp } from "@material-ui/icons";
 import { Link } from "react-router-dom";
@@ -43,6 +44,22 @@ const TaskList = () => {
     }
   };
 
+  const handleDeleteTask = async (taskId) => {
+    try {
+      const token = localStorage.getItem("token");
+      await axios.delete(`/api/task/delete/${taskId}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      setTasks((prevTasks) =>
+        prevTasks.filter((task) => task.taskId !== taskId)
+      );
+      setSelectedTask(null);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   const renderTaskRow = (task) => {
     const isExpanded = task === selectedTask;
     return (
@@ -56,6 +73,15 @@ const TaskList = () => {
           </TableCell>
           <TableCell align="right">{task.dueDate}</TableCell>
           <TableCell align="right">{task.priority}</TableCell>
+          <TableCell align="right">
+            <Button
+              variant="contained"
+              color="secondary"
+              onClick={() => handleDeleteTask(task.taskId)}
+            >
+              Delete task
+            </Button>
+          </TableCell>
         </TableRow>
         <TableRow>
           <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={6}>
@@ -86,6 +112,7 @@ const TaskList = () => {
               <TableCell>Name</TableCell>
               <TableCell align="right">Due Date</TableCell>
               <TableCell align="right">Priority</TableCell>
+              <TableCell align="right">Actions</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>{tasks && tasks.map(renderTaskRow)}</TableBody>
