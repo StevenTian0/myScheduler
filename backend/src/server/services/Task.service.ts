@@ -121,15 +121,10 @@ export async function deleteTask(taskId: string) {
 	}
 }
 
-export const deleteAllTasks = async (userId: string) => {
+export const deleteAllTasks = async (token: string) => {
 	try {
-		const tasks = await Task.find({ user: userId })
-
-		if (!tasks) {
-			throw new Error("Tasks not found")
-		}
-
-		await Task.deleteMany({ user: userId })
+		const user = await fetchUser(token)
+		await Task.deleteMany({ user: user._id })
 
 		return {
 			message: "All tasks deleted successfully",

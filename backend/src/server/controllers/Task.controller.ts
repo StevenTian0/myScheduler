@@ -5,6 +5,7 @@ import {
 	deleteTask,
 	getTask,
 	getAllTasks,
+	deleteAllTasks,
 } from "../services/Task.service"
 
 export const addController = async (req: Request, res: Response) => {
@@ -69,6 +70,17 @@ export const deleteController = async (req: Request, res: Response) => {
 	try {
 		const { taskId } = req.params
 		const result = await deleteTask(taskId)
+
+		res.status(200).json(result)
+	} catch (error: any) {
+		res.status(400).json({ error: error.message })
+	}
+}
+
+export const deleteAllController = async (req: Request, res: Response) => {
+	try {
+		const { token } = req.params
+		const result = await deleteAllTasks(token)
 
 		res.status(200).json(result)
 	} catch (error: any) {
