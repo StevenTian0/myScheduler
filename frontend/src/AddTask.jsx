@@ -14,12 +14,16 @@ const customStyles = {
 
 Modal.setAppElement("#root");
 
-function AddBlocker(props) {
+function AddTask(props) {
   const [modalIsOpen, setModalIsOpen] = useState(false);
-  const [taskStart, setTaskStart] = useState("");
-  const [taskEnd, setTaskEnd] = useState("");
+  //const [taskStart, setTaskStart] = useState("");
+  //const [taskEnd, setTaskEnd] = useState("");
+  const [taskDueDate, setTaskDueDate] = useState("");
+  const [taskLengthOfWork, setTaskLengthOfWork] = useState("");
   const [taskDescription, setTaskDescription] = useState("");
-  const [type, setType] = useState("");
+  const [priorityType, setPriorityType] = useState("");
+  const [categoryType, setCategoryType] = useState("");
+  const [taskID, setTaskID] = useState("");
   const [selectedTask, setSelectedTask] = useState("");
   const [tasks, setTasks] = useState([]);
   const [taskText, setTaskText] = useState("");
@@ -52,21 +56,29 @@ function AddBlocker(props) {
     setTaskText(e.target.value);
   }
 
-  function handleTaskStartChange(e) {
-    setTaskStart(e.target.value);
+  function handleTaskLengthOfWork(e) {
+    setTaskLengthOfWork(e.target.value);
   }
 
-  function handleTaskEndChange(e) {
-    setTaskEnd(e.target.value);
+  function handleTaskDueDate(e) {
+    setTaskDueDate(e.target.value);
   }
 
   function handleTaskDescriptionChange(e) {
     setTaskDescription(e.target.value);
   }
 
-  function handleTypeChange(e) {
-    setType(e.target.value);
+  function handlePriorityTypeChange(e) {
+    setPriorityType(e.target.value);
   }
+
+    function handleCategoryTypeChange(e) {
+      setCategoryType(e.target.value);
+    }
+
+   function handleTaskIDChange(e) {
+      setTaskID(e.target.value);
+    }
 
   function handleTaskSelectChange(e) {
     setSelectedTask(e.target.value);
@@ -81,21 +93,21 @@ function AddBlocker(props) {
   async function handleFormSubmit(e) {
     e.preventDefault();
     const offsetInMilliseconds = 5 * 60 * 60 * 1000; // 5 hours in milliseconds
-    const adjustedStart = new Date(
-      new Date(taskStart).getTime() - offsetInMilliseconds
-    );
-    const adjustedEnd = new Date(
-      new Date(taskEnd).getTime() - offsetInMilliseconds
-    );
-    const duration = (adjustedEnd.getTime() - adjustedStart.getTime()) / 60000;
+//     const adjustedStart = new Date(
+//       new Date(taskStart).getTime() - offsetInMilliseconds
+//     );
+//     const adjustedEnd = new Date(
+//       new Date(taskEnd).getTime() - offsetInMilliseconds
+//     );
+   // const duration = (adjustedEnd.getTime() - adjustedStart.getTime()) / 60000;
 
-    let taskId = "";
-    if (type === "Task") {
-      let task = tasks.find((task) => task.name === selectedTask);
-      taskId = task.taskId;
-    }
+   // let taskId = "";
+//     if (type === "Task") {
+//       let task = tasks.find((task) => task.name === selectedTask);
+//       taskId = task.taskId;
+//     }
 
-    const adjustedStartFormatted = adjustedStart.toISOString();
+   // const adjustedStartFormatted = adjustedStart.toISOString();
     // console.log("Type:", type);
     // console.log("TaskId:", taskId);
     // console.log("Duration:", duration);
@@ -105,21 +117,23 @@ function AddBlocker(props) {
 
     const newBlock = {
       name: taskText,
-      start: adjustedStartFormatted,
+      dueDate: taskDueDate,
+      priorityValue: priorityType,
+      categoryType: categoryType,
       description: taskDescription,
-      duration: duration,
-      taskid: taskId,
+      lengthOfWork: taskLengthOfWork,
+      taskId: taskID,
     };
     console.log(newBlock);
 
     try {
       await props.onSubmit(newBlock);
       setModalIsOpen(false);
-      setTaskStart("");
-      setTaskEnd("");
+      setTaskDueDate("");
+      setTaskLengthOfWork("");
       setTaskText("");
       setTaskDescription("");
-      setType("");
+      setPriorityType("");
       setSelectedTask("");
       setErrorDescription("");
     } catch (error) {
@@ -129,14 +143,14 @@ function AddBlocker(props) {
 
   return (
     <>
-      <button onClick={openModal}>Add Blocker</button>
+      <button onClick={openModal}>Add Task</button>
       <Modal
         isOpen={modalIsOpen}
         onRequestClose={closeModal}
         style={customStyles}
         contentLabel="Add Task Modal"
       >
-        <h2>Add a New Blocker/Schedule</h2>
+        <h2>Add a New Task</h2>
         <form onSubmit={handleFormSubmit}>
           <br />
           <label>
@@ -149,44 +163,70 @@ function AddBlocker(props) {
           </label>
           <br />
           <label>
-            Type:
-            <select value={type} onChange={handleTypeChange}>
-              <option value="">-- Select Type --</option>
-              <option value="Blcoker">blocker</option>
-              <option value="Task">task</option>
+             Task ID:
+             <input
+               type="text"
+               value={taskID}
+               onChange={handleTaskIDChange}
+          />
+          <br>
+          </br>
+          </label>
+          <label>
+            Priority:
+            <select value={priorityType} onChange={handlePriorityTypeChange}>
+              <option value="">-- Select Priority Type --</option>
+              <option value="Urgent">Urgent</option>
+              <option value="High">High</option>
+              <option value="Medium">Medium</option>
+              <option value="Low">Low</option>
             </select>
           </label>
           <br />
-          {type === "Task" && (
-            <label>
-              Select Task:
-              <select value={selectedTask} onChange={handleTaskSelectChange}>
-                <option value="">-- Select Task --</option>
-                {tasks.map((task) => (
-                  <option key={task.id} value={task.name}>
-                    {task.name}
-                  </option>
-                ))}
-              </select>
-            </label>
-          )}
+          <br>
+          </br>
+          <label>
+          Category:
+            <select value={categoryType} onChange={handleCategoryTypeChange}>
+              <option value="">-- Select Category Type --</option>
+              <option value="Unassigned">Unassigned</option>
+              <option value="Assignment">Assignment</option>
+              <option value="Hobby">Hobby</option>
+              <option value="Relaxing">Relaxing</option>
+              <option value="Exercises">Exercises</option>
+            </select>
+          </label>
+                    <br />
+{/*           {type === "Task" && ( */}
+{/*             <label> */}
+{/*               Select Task: */}
+{/*               <select value={selectedTask} onChange={handleTaskSelectChange}> */}
+{/*                 <option value="">-- Select Task --</option> */}
+{/*                 {tasks.map((task) => ( */}
+{/*                   <option key={task.id} value={task.name}> */}
+{/*                     {task.name} */}
+{/*                   </option> */}
+{/*                 ))} */}
+{/*               </select> */}
+{/*             </label> */}
+{/*           )} */}
           <br />
           <br />
           <label>
-            Start Time:
+            Due Date:
             <input
               type="datetime-local"
-              value={taskStart}
-              onChange={handleTaskStartChange}
+              value={taskDueDate}
+              onChange={handleTaskDueDate}
             />
           </label>
           <br />
           <label>
-            End Time:
+            Length of Work:
             <input
-              type="datetime-local"
-              value={taskEnd}
-              onChange={handleTaskEndChange}
+              type="text"
+              value={taskLengthOfWork}
+              onChange={handleTaskLengthOfWork}
             />
           </label>
           <br />
@@ -213,4 +253,4 @@ function AddBlocker(props) {
   );
 }
 
-export default AddBlocker;
+export default AddTask;

@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import Modal from "react-modal";
 import axios from "axios";
 import {
   Table,
@@ -14,6 +15,8 @@ import {
 } from "@material-ui/core";
 import { KeyboardArrowDown, KeyboardArrowUp } from "@material-ui/icons";
 import { Link } from "react-router-dom";
+import AddTask from "./AddTask";
+
 
 const TaskList = () => {
   const [tasks, setTasks] = useState(null);
@@ -35,6 +38,8 @@ const TaskList = () => {
       console.error(error);
     }
   };
+
+
 
   const handleRowClick = (task) => {
     if (selectedTask === task) {
@@ -70,6 +75,47 @@ const TaskList = () => {
       setSelectedTask(null);
     } catch (error) {
       console.error(error);
+
+
+  const handleAddTask = async (newBlock) => {
+    const { name, dueDate, description, taskid, lengthOfWork, priority, category } = newBlock;
+
+    const token = localStorage.getItem("token");
+
+    console.log("Token:", token);
+    console.log("Due Date", dueDate);
+    console.log("Length Of Work:", lengthOfWork);
+    console.log("name:", name);
+    console.log("description:", description);
+    console.log("Priority:", priority);
+    console.log("Category:", category);
+    console.log("taskId:", taskid);
+    // Prepare the data to send to the backend
+    const blockerData = {
+      token,
+      dueDate,
+      priorityValue: priority,
+      categoryValue: category,
+      name,
+      description,
+      taskId: taskid,
+      lengthOfWork,
+    };
+
+    try {
+      // Replace '/api/blocker/add' with the correct API endpoint if needed
+      const response = await axios.post("/api/blocker/add", blockerData);
+      console.log(response.data);
+    } catch (error) {
+      console.error("Error adding blocker:", error);
+
+      let errorMessage = "An error occurred while adding the blocker.";
+      if (error.response && error.response.data && error.response.data.error) {
+        errorMessage = error.response.data.error;
+      }
+
+      throw new Error(errorMessage);
+
     }
   };
 
@@ -119,6 +165,7 @@ const TaskList = () => {
       <Link to="/calendar">
         <button>Go to Calendar</button>
       </Link>
+      <AddTask onSubmit={handleAddTask} />
       <TableContainer component={Paper}>
         <Table>
           <TableHead>
@@ -134,6 +181,7 @@ const TaskList = () => {
       </TableContainer>
     </div>
   );
+
 };
 
 export default TaskList;
