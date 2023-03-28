@@ -75,8 +75,6 @@ const TaskList = () => {
       setSelectedTask(null);
     } catch (error) {
       console.error(error);
-     }
-   };
 
 
   const handleAddTask = async (newBlock) => {
