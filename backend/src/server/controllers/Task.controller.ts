@@ -42,22 +42,24 @@ export const updateController = async (req: Request, res: Response) => {
 	try {
 		const {
 			taskId,
-			token,
 			newDueDate,
 			newLengthOfWork,
 			newName,
 			newDescription,
 			workDone,
+			newPriority,
+			newCategory,
 		} = req.body
 
 		const task = await updateTask({
 			taskId,
-			token,
 			newDueDate,
 			newLengthOfWork,
 			newName,
 			newDescription,
 			workDone,
+			newPriority,
+			newCategory,
 		})
 
 		res.status(201).json({ message: "Task updated successfully", task })
