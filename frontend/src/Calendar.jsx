@@ -83,6 +83,8 @@ class Calendar extends Component {
         e.data.text = modal.result;
         dp.events.update(e);
       },
+      date: "",
+      // added date for the title
     };
   }
 
@@ -167,32 +169,45 @@ class Calendar extends Component {
     return this.calendarRef.current.control;
   }
 
+  getDate() {
+    this.setState({
+      date: new Date().toDateString(),
+    });
+  }
+
   componentDidMount() {
     //this.updateCalendar();
+    this.getDate();
   }
 
   render() {
     return (
-      <div style={styles.wrap}>
-        <div style={styles.left}>
-          <DayPilotNavigator
-            selectMode={"week"}
-            showMonths={1}
-            skipMonths={1}
-            startDate={"2023-03-07"}
-            selectionDay={"2023-03-07"}
-            onTimeRangeSelected={(args) => {
-              this.calendar.update({
-                startDate: args.day,
-              });
-            }}
-          />
-        </div>
-        <div style={styles.main}>
-          <Link to="/tasklist">
-            <button>Go to Task List</button>
-          </Link>
-          <DayPilotCalendar {...this.state} ref={this.calendarRef} />
+      <div style={styles.flex}>
+        <h1>
+          {" "}
+          <center> {this.state.date} </center>
+        </h1>
+        <div style={styles.wrap}>
+          <div style={styles.left}>
+            <DayPilotNavigator
+              selectMode={"week"}
+              showMonths={1}
+              skipMonths={1}
+              startDate={"2023-03-07"}
+              selectionDay={"2023-03-07"}
+              onTimeRangeSelected={(args) => {
+                this.calendar.update({
+                  startDate: args.day,
+                });
+              }}
+            />
+          </div>
+          <div style={styles.main}>
+            <Link to="/tasklist">
+              <button>Go to Task List</button>
+            </Link>
+            <DayPilotCalendar {...this.state} ref={this.calendarRef} />
+          </div>
         </div>
       </div>
     );
