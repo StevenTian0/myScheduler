@@ -40,34 +40,51 @@ class Calendar extends Component {
       durationBarVisible: false,
       timeRangeSelectedHandling: "Enabled",
       onTimeRangeSelected: async (args) => {
-        const dp = this.calendar;
-        const modal = await DayPilot.Modal.form({
-          title: "Create a new task:",
-          fields: [
-            { name: "taskName", title: "Task Name", type: "text" },
-            { name: "startTime", title: "Start Time", type: "time" },
-            { name: "endTime", title: "End Time", type: "time" },
-          ],
-          focus: "taskName",
-        });
-        dp.clearSelection();
-        if (!modal.result) {
-          return;
+        //OLD onTimeRangeSelectedCode
+        // const dp = this.calendar;
+        // const modal = await DayPilot.Modal.form({
+        //   title: "Create a new task:",
+        //   fields: [
+        //     { name: "taskName", title: "Task Name", type: "text" },
+        //     { name: "startTime", title: "Start Time", type: "time" },
+        //     { name: "endTime", title: "End Time", type: "time" },
+        //   ],
+        //   focus: "taskName",
+        // });
+        // dp.clearSelection();
+        // if (!modal.result) {
+        //   return;
+        // }
+
+        // console.log("Selected time range: ", args.start, " - ", args.end);
+
+        // const start = args.start;
+        // const end = args.end;
+        // const id = DayPilot.guid();
+        // const text = modal.result.taskName;
+
+        // dp.events.add({
+        //   start,
+        //   end,
+        //   id,
+        //   text,
+        // });
+
+
+        console.log("Sending blocker(s) to the backend")
+        // Here send the 'queries' to add blockers
+        let startTotal = new Date(args.start.value);
+        let endTotal = new Date(args.end.value);
+        let numBlockers = (endTotal - startTotal) / (1800000);
+        console.log("number of blockers to send: " + numBlockers);
+        for (let i = 0; i < numBlockers; i++) {
+          // Setting the start and end of the blocker to add
+          let startOfBlocker = startTotal + (1800000 * i);
+          let endOfBlocker = startOfBlocker + 1799999;
+          //TODO Query
         }
-
-        console.log("Selected time range: ", args.start, " - ", args.end);
-
-        const start = args.start;
-        const end = args.end;
-        const id = DayPilot.guid();
-        const text = modal.result.taskName;
-
-        dp.events.add({
-          start,
-          end,
-          id,
-          text,
-        });
+        const dp = this.calendar;
+        dp.update();
       },
       eventDeleteHandling: "Update",
       onEventClick: async (args) => {
@@ -82,6 +99,33 @@ class Calendar extends Component {
         const e = args.e;
         e.data.text = modal.result;
         dp.events.update(e);
+      },
+      onBeforeCellRender: args => {
+        // console.log("cell");
+        // console.log(args);
+        args.cell.backColor = "#eeeeee";
+        args.cell.disabled = false;
+
+        let blockers = [
+          {
+            id: 1,
+            start: "2022-02-03T09:00:00",
+            end: "2022-02-03T14:00:00",
+          }
+        ];
+        // let blockers = this.state.blockers;
+        // console.log("blockers:")
+        // console.log(blockers);
+        if (blockers) {
+          for (let i = 0; i < blockers.length; i++) {
+            if (args.cell.start >= blockers[i].start && args.cell.end <= blockers[i].end) {
+              args.cell.backColor = "#aba9a9";
+              // args.cell.disabled = true;
+              args.cell.fontColor = "white"
+              break;
+            }
+          }
+        }
       },
       date: "",
       // added date for the title
