@@ -180,11 +180,20 @@ class Calendar extends Component {
     }
   }
 
+  // getStartOfWeek(date) {
+  //   const startOfWeek = new Date(date);
+  //   const dayOfWeek = startOfWeek.getDay();
+  //   const diff = startOfWeek.getDate() - dayOfWeek;
+  //   startOfWeek.setDate(diff);
+  //   return startOfWeek;
+  // }
+
   getStartOfWeek(date) {
     const startOfWeek = new Date(date);
     const dayOfWeek = startOfWeek.getDay();
-    const diff = startOfWeek.getDate() - dayOfWeek + (dayOfWeek === 0 ? 0 : 1);
+    const diff = startOfWeek.getDate() - (dayOfWeek === 0 ? 0 : dayOfWeek);
     startOfWeek.setDate(diff);
+    console.log("start of week:", startOfWeek);
     return startOfWeek;
   }
 
@@ -207,6 +216,7 @@ class Calendar extends Component {
               skipMonths={1}
               startDate={startOfWeek}
               selectionDay={startOfWeek}
+              //weekStarts={"Sunday"} // Add this line to start the week on Sundays
               onTimeRangeSelected={async (args) => {
                 const selectedStartOfWeek = this.getStartOfWeek(args.day);
                 const selectedEndOfWeek = new Date(selectedStartOfWeek);
