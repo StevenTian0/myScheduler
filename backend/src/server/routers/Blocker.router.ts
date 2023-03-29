@@ -5,11 +5,14 @@ import {
 	getAllBlockersController,
 	getByTimeController,
 	getBetweenTimesController,
+	addMultipleController,
 } from "../controllers/Blocker.controller"
 
 const blockerRouter = Router()
 
 blockerRouter.post("/api/blocker/add", addBlockerController)
+blockerRouter.post("/api/blocker/addMultiple", addMultipleController)
+
 blockerRouter.delete(
 	"/api/blocker/delete/:token/:time",
 	deleteBlockerController

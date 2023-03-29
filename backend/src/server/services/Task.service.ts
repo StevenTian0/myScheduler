@@ -136,22 +136,24 @@ export const deleteAllTasks = async (token: string) => {
 
 interface IUpdateTaskInput {
 	taskId: string
-	token: string
 	newDueDate?: Date
 	newLengthOfWork?: number
 	newName?: string
 	newDescription?: string
 	workDone?: number
+	newPriority?: string
+	newCategory?: string
 }
 
 export const updateTask = async ({
 	taskId,
-	token,
 	newDueDate,
 	newLengthOfWork,
 	newName,
 	newDescription,
 	workDone,
+	newPriority,
+	newCategory,
 }: IUpdateTaskInput) => {
 	try {
 		// Find the task in the database
@@ -188,8 +190,16 @@ export const updateTask = async ({
 			task.description = newDescription
 		}
 
-		//adding work done
+		if (newPriority) {
+			task.priority = getPrioEnum(newPriority)
+		}
+
+		if (newCategory) {
+			task.category = getCategoryEnum(newCategory)
+		}
+
 		if (workDone) {
+			//adding work done
 			if (workDone < 0) {
 				throw new Error("Task progress cannot be negative")
 			} else {
