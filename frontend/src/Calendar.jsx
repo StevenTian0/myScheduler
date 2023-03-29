@@ -40,52 +40,42 @@ class Calendar extends Component {
       durationBarVisible: false,
       timeRangeSelectedHandling: "Enabled",
       onTimeRangeSelected: async (args) => {
-        //OLD onTimeRangeSelectedCode
-        // const dp = this.calendar;
-        // const modal = await DayPilot.Modal.form({
-        //   title: "Create a new task:",
-        //   fields: [
-        //     { name: "taskName", title: "Task Name", type: "text" },
-        //     { name: "startTime", title: "Start Time", type: "time" },
-        //     { name: "endTime", title: "End Time", type: "time" },
-        //   ],
-        //   focus: "taskName",
-        // });
-        // dp.clearSelection();
-        // if (!modal.result) {
-        //   return;
-        // }
-
-        // console.log("Selected time range: ", args.start, " - ", args.end);
-
-        // const start = args.start;
-        // const end = args.end;
-        // const id = DayPilot.guid();
-        // const text = modal.result.taskName;
-
-        // dp.events.add({
-        //   start,
-        //   end,
-        //   id,
-        //   text,
-        // });
-
-
-        console.log("Sending blocker(s) to the backend")
-        // Here send the 'queries' to add blockers
+        console.log("Sending blocker(s) to the backend");
         let startTotal = new Date(args.start.value);
         let endTotal = new Date(args.end.value);
-        let numBlockers = (endTotal - startTotal) / (1800000);
-        console.log("number of blockers to send: " + numBlockers);
-        for (let i = 0; i < numBlockers; i++) {
-          // Setting the start and end of the blocker to add
-          let startOfBlocker = startTotal + (1800000 * i);
-          let endOfBlocker = startOfBlocker + 1799999;
-          //TODO Query
+        let numBlockers = (endTotal - startTotal) / 1800000;
+        const token = localStorage.getItem("token");
+        const blockerData = {
+          token,
+          time: startTotal.toISOString(), // Convert the date to ISO string format
+          number: numBlockers,
+        };
+        try {
+          // Call the backend endpoint with the prepared data
+          const response = await axios.post(
+            "/api/blocker/addMultiple",
+            blockerData
+          );
+          console.log(response.data);
+        } catch (error) {
+          console.error("Error adding multiple blockers:", error);
+
+          let errorMessage =
+            "An error occurred while adding multiple blockers.";
+          if (
+            error.response &&
+            error.response.data &&
+            error.response.data.error
+          ) {
+            errorMessage = error.response.data.error;
+          }
+
+          throw new Error(errorMessage);
         }
         const dp = this.calendar;
         dp.update();
       },
+
       eventDeleteHandling: "Update",
       onEventClick: async (args) => {
         const dp = this.calendar;
@@ -100,7 +90,7 @@ class Calendar extends Component {
         e.data.text = modal.result;
         dp.events.update(e);
       },
-      onBeforeCellRender: args => {
+      onBeforeCellRender: (args) => {
         // console.log("cell");
         // console.log(args);
         args.cell.backColor = "#eeeeee";
@@ -111,17 +101,20 @@ class Calendar extends Component {
             id: 1,
             start: "2022-02-03T09:00:00",
             end: "2022-02-03T14:00:00",
-          }
+          },
         ];
         // let blockers = this.state.blockers;
         // console.log("blockers:")
         // console.log(blockers);
         if (blockers) {
           for (let i = 0; i < blockers.length; i++) {
-            if (args.cell.start >= blockers[i].start && args.cell.end <= blockers[i].end) {
+            if (
+              args.cell.start >= blockers[i].start &&
+              args.cell.end <= blockers[i].end
+            ) {
               args.cell.backColor = "#aba9a9";
               // args.cell.disabled = true;
-              args.cell.fontColor = "white"
+              args.cell.fontColor = "white";
               break;
             }
           }
@@ -131,83 +124,6 @@ class Calendar extends Component {
       // added date for the title
     };
   }
-
-  // getAllTasks = async () => {
-  //   try {
-  //     const userToken = localStorage.getItem("token"); // Replace this with the actual token
-  //     const response = await axios.post(
-  //       "/api/task/getAllTasks",
-  //       {
-  //         token: userToken,
-  //       },
-  //       {
-  //         headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
-  //       }
-  //     );
-
-  //     const tasks = response.data.tasks.map((task) => ({
-  //       start: new Date(
-  //         task.dueDate - task.lengthOfWork * 60 * 1000
-  //       ).toISOString(),
-  //       end: new Date(task.dueDate).toISOString(),
-  //       id: task.taskId,
-  //       text: task.name,
-  //       description: task.description,
-  //       category: task.category,
-  //       priority: task.priority,
-  //       backColor:
-  //         task.priority === "high"
-  //           ? "red"
-  //           : task.priority === "medium"
-  //           ? "orange"
-  //           : "green",
-  //     }));
-  //     this.calendar.update({ events: tasks });
-  //   } catch (error) {
-  //     console.error("Error fetching tasks:", error);
-  //   }
-  // };
-
-  // updateCalendar = async () => {
-  //   await this.getAllTasks();
-  // };
-
-  handleAddBlocker = async (newBlock) => {
-    const { name, start, description, taskid, duration } = newBlock;
-
-    const token = localStorage.getItem("token");
-
-    console.log("Token:", token);
-    console.log("Start", start);
-    console.log("Duration:", duration);
-    console.log("name:", name);
-    console.log("description:", description);
-    console.log("taskId:", taskid);
-    // Prepare the data to send to the backend
-    const blockerData = {
-      token,
-      time: start,
-      duration,
-      name,
-      description,
-      task: taskid,
-    };
-
-    try {
-      // Replace '/api/blocker/add' with the correct API endpoint if needed
-      const response = await axios.post("/api/blocker/add", blockerData);
-      console.log(response.data);
-    } catch (error) {
-      console.error("Error adding blocker:", error);
-
-      let errorMessage = "An error occurred while adding the blocker.";
-      if (error.response && error.response.data && error.response.data.error) {
-        errorMessage = error.response.data.error;
-      }
-
-      throw new Error(errorMessage);
-    }
-  };
 
   get calendar() {
     return this.calendarRef.current.control;
@@ -224,7 +140,19 @@ class Calendar extends Component {
     this.getDate();
   }
 
+  getStartOfWeek(date) {
+    const startOfWeek = new Date(date);
+    const dayOfWeek = startOfWeek.getDay();
+    const diff = startOfWeek.getDate() - dayOfWeek + (dayOfWeek === 0 ? -6 : 1);
+    startOfWeek.setDate(diff);
+    return startOfWeek;
+  }
+
   render() {
+    const currentDate = new Date();
+    const startOfWeek = this.getStartOfWeek(currentDate)
+      .toISOString()
+      .slice(0, 10);
     return (
       <div style={styles.flex}>
         <h1>
@@ -237,8 +165,8 @@ class Calendar extends Component {
               selectMode={"week"}
               showMonths={1}
               skipMonths={1}
-              startDate={"2023-03-07"}
-              selectionDay={"2023-03-07"}
+              startDate={startOfWeek}
+              selectionDay={startOfWeek}
               onTimeRangeSelected={(args) => {
                 this.calendar.update({
                   startDate: args.day,
