@@ -16,7 +16,7 @@ import {
 import { KeyboardArrowDown, KeyboardArrowUp } from "@material-ui/icons";
 import { Link } from "react-router-dom";
 import AddTask from "./AddTask";
-
+import UpdateTask from "./UpdateTask";
 
 const TaskList = () => {
   const [tasks, setTasks] = useState(null);
@@ -38,8 +38,6 @@ const TaskList = () => {
       console.error(error);
     }
   };
-
-
 
   const handleRowClick = (task) => {
     if (selectedTask === task) {
@@ -77,6 +75,7 @@ const TaskList = () => {
       console.error(error);
     }
     };
+
 
   const handleAddTask = async (newTask) => {
     const { name, dueDate, description, taskId, lengthOfWork, priorityValue, categoryValue } = newTask;
@@ -120,8 +119,50 @@ const TaskList = () => {
     }
   };
 
+
+  const handleUpdateTask = async (updatedTask) => {
+    const {
+      taskId,
+      newName,
+      newDueDate,
+      newDescription,
+      newLengthOfWork,
+      workDone,
+    } = updatedTask;
+
+    const token = localStorage.getItem("token");
+
+    const taskData = {
+      taskId,
+      newName,
+      newDueDate,
+      newDescription,
+      newLengthOfWork,
+      workDone,
+    };
+
+    try {
+      // Replace '/api/task/update/:id' with the correct API endpoint if needed
+      const response = await axios.patch(`/api/task/update`, taskData);
+      console.log(response.data);
+    } catch (error) {
+      console.error("Error updating task:", error);
+
+      let errorMessage = "An error occurred while updating the task.";
+      if (error.response && error.response.data && error.response.data.error) {
+        errorMessage = error.response.data.error;
+      }
+
+      throw new Error(errorMessage);
+    }
+  };  
+
   const renderTaskRow = (task) => {
     const isExpanded = task === selectedTask;
+    const handleSubmit = (updatedTask) => {
+        updatedTask.taskId = task.taskId;
+        handleUpdateTask(updatedTask);
+    };
     return (
       <React.Fragment key={task.taskId}>
         <TableRow onClick={() => handleRowClick(task)}>
@@ -134,6 +175,7 @@ const TaskList = () => {
           <TableCell align="right">{task.dueDate}</TableCell>
           <TableCell align="right">{task.priority}</TableCell>
           <TableCell align="right">
+          <UpdateTask onSubmit={handleSubmit} />
             <Button
               variant="contained"
               color="secondary"
