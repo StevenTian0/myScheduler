@@ -29,6 +29,7 @@ class Calendar extends Component {
     this.state = {
       isModalOpen: false,
       taskName: "",
+      blockers: [],
     };
     this.state = {
       isModalOpen: false,
@@ -74,6 +75,13 @@ class Calendar extends Component {
         }
         const dp = this.calendar;
         dp.update();
+        const selectedStartOfWeek = this.getStartOfWeek(args.start.value);
+        const selectedEndOfWeek = new Date(selectedStartOfWeek);
+        selectedEndOfWeek.setDate(selectedEndOfWeek.getDate() + 6);
+        await this.updateCalendar(
+          selectedStartOfWeek.toISOString(),
+          selectedEndOfWeek.toISOString()
+        );
       },
 
       eventDeleteHandling: "Update",
@@ -95,25 +103,19 @@ class Calendar extends Component {
         // console.log(args);
         args.cell.backColor = "#eeeeee";
         args.cell.disabled = false;
-
-        let blockers = [
-          {
-            id: 1,
-            start: "2022-02-03T09:00:00",
-            end: "2022-02-03T14:00:00",
-          },
-        ];
         // let blockers = this.state.blockers;
         // console.log("blockers:")
         // console.log(blockers);
+        let blockers = this.state.blockers;
         if (blockers) {
           for (let i = 0; i < blockers.length; i++) {
             if (
               args.cell.start >= blockers[i].start &&
               args.cell.end <= blockers[i].end
             ) {
-              args.cell.backColor = "#aba9a9";
+              //args.cell.backColor = "#aba9a9";
               // args.cell.disabled = true;
+              args.cell.backColor = "#808080";
               args.cell.fontColor = "white";
               break;
             }
@@ -135,15 +137,53 @@ class Calendar extends Component {
     });
   }
 
-  componentDidMount() {
+  async componentDidMount() {
     //this.updateCalendar();
     this.getDate();
+    const startOfWeek = this.getStartOfWeek(new Date());
+    const endOfWeek = new Date(startOfWeek);
+    endOfWeek.setDate(endOfWeek.getDate() + 6);
+    await this.updateCalendar(
+      startOfWeek.toISOString(),
+      endOfWeek.toISOString()
+    );
+  }
+
+  async updateCalendar(startTime, endTime) {
+    const token = localStorage.getItem("token");
+
+    try {
+      const response = await axios.get(
+        `/api/blockers/getBetweenTimes/${token}/${startTime}/${endTime}`
+      );
+
+      console.log(response.data);
+      const blockers = response.data.blockers.map((blocker) => ({
+        start: new Date(blocker.time).getTime(),
+        end: new Date(blocker.time).getTime() + blocker.duration * 60000,
+        backColor: "#808080",
+      }));
+
+      this.calendar.events.list = blockers;
+      //this.setState({ blockers: blockers }); // Add this line here
+      console.log(blockers);
+      this.calendar.update();
+    } catch (error) {
+      console.error("Error updating calendar:", error);
+
+      let errorMessage = "An error occurred while updating the calendar.";
+      if (error.response && error.response.data && error.response.data.error) {
+        errorMessage = error.response.data.error;
+      }
+
+      throw new Error(errorMessage);
+    }
   }
 
   getStartOfWeek(date) {
     const startOfWeek = new Date(date);
     const dayOfWeek = startOfWeek.getDay();
-    const diff = startOfWeek.getDate() - dayOfWeek + (dayOfWeek === 0 ? -6 : 1);
+    const diff = startOfWeek.getDate() - dayOfWeek + (dayOfWeek === 0 ? 0 : 1);
     startOfWeek.setDate(diff);
     return startOfWeek;
   }
@@ -167,7 +207,16 @@ class Calendar extends Component {
               skipMonths={1}
               startDate={startOfWeek}
               selectionDay={startOfWeek}
-              onTimeRangeSelected={(args) => {
+              onTimeRangeSelected={async (args) => {
+                const selectedStartOfWeek = this.getStartOfWeek(args.day);
+                const selectedEndOfWeek = new Date(selectedStartOfWeek);
+                selectedEndOfWeek.setDate(selectedEndOfWeek.getDate() + 6);
+
+                await this.updateCalendar(
+                  selectedStartOfWeek.toISOString(),
+                  selectedEndOfWeek.toISOString()
+                );
+
                 this.calendar.update({
                   startDate: args.day,
                 });

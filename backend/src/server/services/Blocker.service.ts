@@ -49,6 +49,7 @@ export const addMultiple = async (
 	try {
 		const startTime = new Date(time)
 		time = new Date(time)
+		time = new Date(time.getTime() - 60000 * 240)
 		for (var i = 1; i <= number; i++) {
 			await addBlocker(token, time)
 			time = new Date(time.getTime() + 30 * 60000)
