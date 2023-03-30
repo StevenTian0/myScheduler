@@ -77,6 +77,8 @@ class Calendar extends Component {
         dp.update();
         const selectedStartOfWeek = this.getStartOfWeek(args.start.value);
         const selectedEndOfWeek = new Date(selectedStartOfWeek);
+        console.log("selectedStartOfWeek:", selectedStartOfWeek);
+        console.log("selectedEndOfWeek:", selectedEndOfWeek);
         selectedEndOfWeek.setDate(selectedEndOfWeek.getDate() + 6);
         await this.updateCalendar(
           selectedStartOfWeek.toISOString(),
@@ -213,6 +215,7 @@ class Calendar extends Component {
     const dayOfWeek = startOfWeek.getDay();
     const diff = startOfWeek.getDate() - (dayOfWeek === 0 ? 0 : dayOfWeek);
     startOfWeek.setDate(diff);
+    startOfWeek.setHours(0, 0, 0, 0);
     console.log("start of week:", startOfWeek);
     return startOfWeek;
   }
