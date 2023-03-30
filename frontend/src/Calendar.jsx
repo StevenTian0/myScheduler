@@ -79,7 +79,7 @@ class Calendar extends Component {
         const selectedEndOfWeek = new Date(selectedStartOfWeek);
         console.log("selectedStartOfWeek:", selectedStartOfWeek);
         console.log("selectedEndOfWeek:", selectedEndOfWeek);
-        selectedEndOfWeek.setDate(selectedEndOfWeek.getDate() + 6);
+        selectedEndOfWeek.setDate(selectedEndOfWeek.getDate() + 7);
         await this.updateCalendar(
           selectedStartOfWeek.toISOString(),
           selectedEndOfWeek.toISOString()
@@ -164,7 +164,7 @@ class Calendar extends Component {
     this.getDate();
     const startOfWeek = this.getStartOfWeek(new Date());
     const endOfWeek = new Date(startOfWeek);
-    endOfWeek.setDate(endOfWeek.getDate() + 6);
+    endOfWeek.setDate(endOfWeek.getDate() + 7);
     await this.updateCalendar(
       startOfWeek.toISOString(),
       endOfWeek.toISOString()
@@ -243,7 +243,7 @@ class Calendar extends Component {
               onTimeRangeSelected={async (args) => {
                 const selectedStartOfWeek = this.getStartOfWeek(args.day);
                 const selectedEndOfWeek = new Date(selectedStartOfWeek);
-                selectedEndOfWeek.setDate(selectedEndOfWeek.getDate() + 6);
+                selectedEndOfWeek.setDate(selectedEndOfWeek.getDate() + 7);
 
                 await this.updateCalendar(
                   selectedStartOfWeek.toISOString(),
