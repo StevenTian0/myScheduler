@@ -5,7 +5,8 @@ import Blocker from "../models/Blocker.model"
 export const addBlocker = async (
 	token: string,
 	time: Date,
-	duration: number = 30
+	duration: number = 30,
+	task: string
 ) => {
 	try {
 		time = new Date(time)
@@ -30,6 +31,7 @@ export const addBlocker = async (
 			time,
 			duration,
 			user: user._id,
+			task
 		})
 
 		await newBlocker.save()
