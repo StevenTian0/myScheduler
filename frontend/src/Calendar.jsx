@@ -86,17 +86,36 @@ class Calendar extends Component {
 
       eventDeleteHandling: "Update",
       onEventClick: async (args) => {
-        const dp = this.calendar;
-        const modal = await DayPilot.Modal.prompt(
-          "Update event text:",
-          args.e.text()
-        );
-        if (!modal.result) {
+        if (!window.confirm("Are you sure you want to delete this blocker?")) {
           return;
         }
-        const e = args.e;
-        e.data.text = modal.result;
-        dp.events.update(e);
+
+        const blockerStartTime = args.e.start().toString();
+
+        try {
+          const token = localStorage.getItem("token");
+          const response = await axios.delete(
+            `/api/blocker/delete/${token}/${blockerStartTime}`
+          );
+          console.log(response.data);
+
+          const dp = this.calendar;
+          dp.events.remove(args.e);
+          dp.update();
+        } catch (error) {
+          console.error("Error deleting blocker:", error);
+
+          let errorMessage = "An error occurred while deleting the blocker.";
+          if (
+            error.response &&
+            error.response.data &&
+            error.response.data.error
+          ) {
+            errorMessage = error.response.data.error;
+          }
+
+          alert(errorMessage);
+        }
       },
       onBeforeCellRender: (args) => {
         // console.log("cell");
@@ -122,6 +141,7 @@ class Calendar extends Component {
           }
         }
       },
+
       date: "",
       // added date for the title
     };

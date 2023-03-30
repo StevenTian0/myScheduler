@@ -65,6 +65,7 @@ export const addMultiple = async (
 export const deleteBlocker = async (token: string, time: Date) => {
 	try {
 		const user = await fetchUser(token)
+		time = new Date(time.getTime() - 60000 * 240)
 		const blocker = await Blocker.findOne({ user: user._id, time: time })
 		if (!blocker) {
 			throw new Error("Blocker not found")
