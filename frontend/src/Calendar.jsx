@@ -216,7 +216,8 @@ class Calendar extends Component {
       const response = await axios.get(`/api/task/getAllWorkSessions/${token}`);
       const allWorkSessions = response.data;
       console.log("allWorkSessions: ", allWorkSessions);
-      this.setState({ workSessions: allWorkSessions });
+      const earliestStartDate = this.getEarliestDate(allWorkSessions);
+      this.setState({ workSessions: allWorkSessions, earliestStartDate });
       this.toggleGeneratedMessage();
     } catch (error) {
       console.error("Error generating schedule:", error);
@@ -257,7 +258,7 @@ class Calendar extends Component {
     this.setState({ showGeneratedMessage: true }, () => {
       setTimeout(() => {
         this.setState({ showGeneratedMessage: false });
-      }, 1000);
+      }, 2000);
     });
   }
 
@@ -282,6 +283,20 @@ class Calendar extends Component {
       color += ("00" + value.toString(16)).substr(-2);
     }
     return color;
+  }
+
+  getEarliestDate(workSessions) {
+    let earliestDate = new Date(workSessions[0].start);
+
+    workSessions.forEach((workSession) => {
+      const currentDate = new Date(workSession.start);
+
+      if (currentDate < earliestDate) {
+        earliestDate = currentDate;
+      }
+    });
+
+    return earliestDate;
   }
 
   render() {
@@ -329,9 +344,11 @@ class Calendar extends Component {
             </button>
             {this.state.showGeneratedMessage && (
               <span style={{ marginLeft: "10px", color: "green" }}>
-                Schedule is generated!
+                Schedule is generated! Start work on{" "}
+                {this.state.earliestStartDate.toLocaleDateString()}
               </span>
             )}
+
             <DayPilotCalendar {...this.state} ref={this.calendarRef} />
           </div>
         </div>
