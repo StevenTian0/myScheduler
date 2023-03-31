@@ -11,6 +11,7 @@ import { Link } from "react-router-dom";
 import axios from "axios";
 import { saveAs } from "file-saver";
 import Timer from "./Timer";
+import {create} from "string-table"
 
 //import AddBlocker from "./AddBlocker";
 
@@ -185,8 +186,26 @@ class Calendar extends Component {
     try {
       const token = localStorage.getItem("token");
       const response = await axios.get(`/api/blockers/getAll/${token}`);
-      const report = response.data.blockers;
-      var blob = new Blob([JSON.stringify(report)], {
+      const blockers = response.data.blockers;
+      var tasks = []
+      var report = "Productivity Report\n\n";
+
+      //TODO: after merging with final task model, remove blockers and format
+      //(remove ids, __V, user info...)
+
+      // blockers.forEach(function (blocker) {
+      //   if (hero.hasOwnProperty('task')) {
+      //     const displayTask = {
+            
+      //     };
+
+      //   }
+      // });
+
+      // report += create(tasks);
+      report += create(blockers);
+
+      var blob = new Blob([report], {
         type: "text/plain;charset=utf-8",
       });
       saveAs(blob, "productivity report.txt");
@@ -200,25 +219,27 @@ class Calendar extends Component {
       const token = localStorage.getItem("token");
       const response = await axios.get(`/api/blockers/getAll/${token}`);
       const blockers = response.data.blockers;
-      const report = [];
+      const todayTask =[];
+      var report = "Daily Log\n\n";
       const today = new Date()
 
       blockers.forEach((b) => {
-        console.log((b.time));
-        console.log(today.getFullYear())
-        console.log(today.getMonth())
-        console.log(today.getDay())
 
-        if ((Date.parse(b.time.getDate) == today)) {
-          report.push(b);
+        if ((today.toISOString().substring(0,10) === b.time.substring(0,10))) {
+          todayTask.push(b);
         }
 
       });
 
-      console.log(JSON.stringify(report));
+      if (todayTask.length == 0) {
+        report += "nothing planned for today"
+      }
+      else {
+        report += create(todayTask)
+      }
 
-      var blob = new Blob([JSON.stringify(report)], {type: "text/plain;charset=utf-8"});
-      // saveAs(blob, "productivity report.txt");
+      var blob = new Blob([report], {type: "text/plain;charset=utf-8"});
+      saveAs(blob, "Daily Log.txt");
     } catch (error) {
       console.error(error);
     }
@@ -233,7 +254,7 @@ class Calendar extends Component {
       var blob = new Blob([JSON.stringify(response.data.tasks)], {
         type: "text/plain;charset=utf-8",
       });
-      saveAs(blob, "productivity report.txt");
+      saveAs(blob, "tasks.txt");
     } catch (error) {
       console.error(error);
     }
@@ -303,11 +324,11 @@ class Calendar extends Component {
             />
             <div style={styles.pad}>
               <center>
-                <button type="button" onClick={this.exportReport}>
-                  Get Productivity Report
-                </button>
                 <button type="button" onClick={this.exportTasks}>
                   Export Tasks
+                </button>
+                <button type="button" onClick={this.exportReport}>
+                  Get Productivity Report
                 </button>
                 <button type="button" onClick={this.exportDay}>
                   Daily Log
