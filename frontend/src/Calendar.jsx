@@ -28,6 +28,7 @@ class Calendar extends Component {
     super(props);
     this.calendarRef = React.createRef();
     this.state = {
+      showGeneratedMessage: false,
       isModalOpen: false,
       taskName: "",
       blockers: [],
@@ -52,7 +53,7 @@ class Calendar extends Component {
             "/api/blocker/addMultiple",
             blockerData
           );
-          console.log("multiple blockers: ", response.data);
+          //console.log("multiple blockers: ", response.data);
         } catch (error) {
           console.error("Error adding multiple blockers:", error);
 
@@ -174,7 +175,7 @@ class Calendar extends Component {
         `/api/blockers/getBetweenTimes/${token}/${startTime}/${endTime}`
       );
 
-      console.log("blocker between time:", response.data);
+      //console.log("blocker between time:", response.data);
       const blockers = response.data.blockers.map((blocker) => ({
         start: new Date(blocker.time).getTime(),
         end: new Date(blocker.time).getTime() + blocker.duration * 60000,
@@ -189,6 +190,7 @@ class Calendar extends Component {
       const calendarWorkSessions = this.transformWorkSessionsToEvents(
         currentWeekWorkSessions
       );
+      console.log("calendarWorkSession: ", calendarWorkSessions);
 
       // Combine blockers and work sessions
       const combinedEvents = [...blockers, ...calendarWorkSessions];
@@ -215,6 +217,7 @@ class Calendar extends Component {
       const allWorkSessions = response.data;
       console.log("allWorkSessions: ", allWorkSessions);
       this.setState({ workSessions: allWorkSessions });
+      this.toggleGeneratedMessage();
     } catch (error) {
       console.error("Error generating schedule:", error);
       let errorMessage = "An error occurred while generating the schedule.";
@@ -239,12 +242,22 @@ class Calendar extends Component {
       let endDate = new Date(workSession.end);
       startDate = new Date(startDate.getTime() - 60000 * 240);
       endDate = new Date(endDate.getTime() - 60000 * 240);
-
+      const color = this.generateColorFromString(workSession.task);
+      //console.log("work session: ", workSession);
       return {
         start: startDate.toISOString(),
         end: endDate.toISOString(),
-        text: workSession.name,
+        text: workSession.task,
+        backColor: color, // Add the color property
       };
+    });
+  }
+
+  toggleGeneratedMessage() {
+    this.setState({ showGeneratedMessage: true }, () => {
+      setTimeout(() => {
+        this.setState({ showGeneratedMessage: false });
+      }, 1000);
     });
   }
 
@@ -256,6 +269,19 @@ class Calendar extends Component {
     startOfWeek.setHours(0, 0, 0, 0);
     //console.log("start of week:", startOfWeek);
     return startOfWeek;
+  }
+
+  generateColorFromString(str) {
+    let hash = 0;
+    for (let i = 0; i < str.length; i++) {
+      hash = str.charCodeAt(i) + ((hash << 5) - hash);
+    }
+    let color = "#";
+    for (let i = 0; i < 3; i++) {
+      const value = (hash >> (i * 8)) & 0xff;
+      color += ("00" + value.toString(16)).substr(-2);
+    }
+    return color;
   }
 
   render() {
@@ -301,6 +327,11 @@ class Calendar extends Component {
             <button onClick={() => this.generateSchedule()}>
               Generate Schedule
             </button>
+            {this.state.showGeneratedMessage && (
+              <span style={{ marginLeft: "10px", color: "green" }}>
+                Schedule is generated!
+              </span>
+            )}
             <DayPilotCalendar {...this.state} ref={this.calendarRef} />
           </div>
         </div>
