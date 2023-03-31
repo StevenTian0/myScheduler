@@ -41,9 +41,31 @@ export const addBlocker = async (
 	}
 }
 
+export const addMultiple = async (
+	token: string,
+	time: Date,
+	number: number
+) => {
+	try {
+		const startTime = new Date(time)
+		time = new Date(time)
+		time = new Date(time.getTime() - 60000 * 240)
+		for (var i = 1; i <= number; i++) {
+			await addBlocker(token, time)
+			time = new Date(time.getTime() + 30 * 60000)
+		}
+		const endTime = new Date(time)
+
+		return { message: "Blockers added", startTime, endTime }
+	} catch (error) {
+		throw error
+	}
+}
+
 export const deleteBlocker = async (token: string, time: Date) => {
 	try {
 		const user = await fetchUser(token)
+		time = new Date(time.getTime() - 60000 * 240)
 		const blocker = await Blocker.findOne({ user: user._id, time: time })
 		if (!blocker) {
 			throw new Error("Blocker not found")
