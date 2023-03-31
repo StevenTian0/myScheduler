@@ -317,6 +317,7 @@ class Calendar extends Component {
                 </button> */}
               </center>
             </div>
+            <Timer />
           </div>
           <div style={styles.main}>
             <Link to="/tasklist">
