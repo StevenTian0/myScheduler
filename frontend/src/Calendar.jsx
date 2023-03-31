@@ -1,4 +1,5 @@
 import React, { Component } from "react";
+import fetchTasks from "./AddTask";
 import Modal from "react-modal";
 import {
   DayPilot,
@@ -8,6 +9,8 @@ import {
 import { Link } from "react-router-dom";
 
 import axios from "axios";
+import { saveAs } from "file-saver";
+import Timer from "./Timer";
 
 //import AddBlocker from "./AddBlocker";
 
@@ -20,6 +23,9 @@ const styles = {
   },
   main: {
     flexGrow: "1",
+  },
+  pad: {
+    padding: 20,
   },
 };
 
@@ -175,6 +181,100 @@ class Calendar extends Component {
     });
   }
 
+  exportReport = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      const response = await axios.get(`/api/blockers/getAll/${token}`);
+      const report = response.data.blockers;
+      var blob = new Blob([JSON.stringify(report)], {
+        type: "text/plain;charset=utf-8",
+      });
+      saveAs(blob, "productivity report.txt");
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  exportDay = async (date) => {
+    try {
+      const token = localStorage.getItem("token");
+      const response = await axios.get(`/api/blockers/getAll/${token}`);
+      const blockers = response.data.blockers;
+      const report = [];
+      const today = new Date()
+
+      blockers.forEach((b) => {
+        console.log((b.time));
+        console.log(today.getFullYear())
+        console.log(today.getMonth())
+        console.log(today.getDay())
+
+        if ((Date.parse(b.time.getDate) == today)) {
+          report.push(b);
+        }
+
+      });
+
+      console.log(JSON.stringify(report));
+
+      var blob = new Blob([JSON.stringify(report)], {type: "text/plain;charset=utf-8"});
+      // saveAs(blob, "productivity report.txt");
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  exportTasks = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      const response = await axios.get(`/api/task/getAll/${token}`);
+
+      console.log(JSON.stringify(response.data.tasks));
+      var blob = new Blob([JSON.stringify(response.data.tasks)], {
+        type: "text/plain;charset=utf-8",
+      });
+      saveAs(blob, "productivity report.txt");
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  // importTasks = async () => {
+  //   try {
+  //     const token = localStorage.getItem("token");
+
+  //     const tasks = JSON.parse(
+  //       `{"_id":"6423916fc62d08a2d58548cd","taskId":"21","priority":"0","dueDate":"2025-12-17T08:24:00.000Z","lengthOfWork":5,"workDoneSoFar":0,"name":"New Task","description":"","category":"Unassigned","user":"63fae0b926b0e497994f5a8a","__v"}`
+  //     )
+      
+
+  //     // console.log(tasks);
+  //     console.log('{"name":"John", "age":30, "city":"New York"}'.json);
+
+  //     const taskId = "";
+	// 		const dueDate = "";
+	// 		const lengthOfWork = "";
+  //     const priorityValue = "";
+  //     const categoryValue = "";
+  //     const name = "";
+  //     const description = "";
+
+  //     const response = await axios.post("/api/blockers/add", {
+  //       taskId,
+	// 		  dueDate,
+	// 		  lengthOfWork,
+	// 		  priorityValue,
+	// 		  token,
+	// 		  categoryValue,
+	// 		  name,
+	// 		  description,
+  //     });
+      
+  //   } catch (error) {
+  //     console.error(error);
+  //   }
+  // };
+
   componentDidMount() {
     //this.updateCalendar();
     this.getDate();
@@ -201,6 +301,22 @@ class Calendar extends Component {
                 });
               }}
             />
+            <div style={styles.pad}>
+              <center>
+                <button type="button" onClick={this.exportReport}>
+                  Get Productivity Report
+                </button>
+                <button type="button" onClick={this.exportTasks}>
+                  Export Tasks
+                </button>
+                <button type="button" onClick={this.exportDay}>
+                  Daily Log
+                </button>
+                {/* <button type="button" onClick={this.importTasks}>
+                  Import Tasks
+                </button> */}
+              </center>
+            </div>
           </div>
           <div style={styles.main}>
             <Link to="/tasklist">
