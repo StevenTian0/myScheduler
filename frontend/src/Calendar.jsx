@@ -75,7 +75,7 @@ class Calendar extends Component {
         //console.log("selectedStartOfWeek:", selectedStartOfWeek);
         //console.log("selectedEndOfWeek:", selectedEndOfWeek);
         selectedEndOfWeek.setDate(selectedEndOfWeek.getDate() + 7);
-        await this.updateCalendarWithTasksAndBlockers(
+        await this.updateCalendar(
           selectedStartOfWeek.toISOString(),
           selectedEndOfWeek.toISOString()
         );
@@ -160,7 +160,7 @@ class Calendar extends Component {
     const startOfWeek = this.getStartOfWeek(new Date());
     const endOfWeek = new Date(startOfWeek);
     endOfWeek.setDate(endOfWeek.getDate() + 7);
-    await this.updateCalendarWithTasksAndBlockers(
+    await this.updateCalendar(
       startOfWeek.toISOString(),
       endOfWeek.toISOString()
     );
@@ -181,9 +181,20 @@ class Calendar extends Component {
         backColor: "#808080",
       }));
 
-      this.calendar.events.list = blockers;
-      //this.setState({ blockers: blockers }); // Add this line here
-      //console.log("blockers: ", blockers);
+      const currentWeekWorkSessions = this.filterCurrentWeekWorkSessions(
+        this.state.workSessions,
+        startTime,
+        endTime
+      );
+      const calendarWorkSessions = this.transformWorkSessionsToEvents(
+        currentWeekWorkSessions
+      );
+
+      // Combine blockers and work sessions
+      const combinedEvents = [...blockers, ...calendarWorkSessions];
+
+      // Update calendar events
+      this.calendar.events.list = combinedEvents;
       this.calendar.update();
     } catch (error) {
       console.error("Error updating calendar:", error);
@@ -197,29 +208,13 @@ class Calendar extends Component {
     }
   }
 
-  async generateSchedule(args) {
+  async generateSchedule() {
     const token = localStorage.getItem("token");
     try {
       const response = await axios.get(`/api/task/getAllWorkSessions/${token}`);
       const allWorkSessions = response.data;
       console.log("allWorkSessions: ", allWorkSessions);
-      const currentWeekWorkSessions =
-        this.filterCurrentWeekWorkSessions(allWorkSessions);
-      this.setState({ workSessions: currentWeekWorkSessions });
-      console.log("current: ", currentWeekWorkSessions);
-
-      // Get the start and end of the current week
-      const selectedStartOfWeek = this.getStartOfWeek(args.start.value);
-      const selectedEndOfWeek = new Date(selectedStartOfWeek);
-      //console.log("selectedStartOfWeek:", selectedStartOfWeek);
-      //console.log("selectedEndOfWeek:", selectedEndOfWeek);
-      selectedEndOfWeek.setDate(selectedEndOfWeek.getDate() + 7);
-
-      // Update the calendar with tasks and blockers
-      await this.updateCalendarWithTasksAndBlockers(
-        selectedStartOfWeek.toISOString(),
-        selectedEndOfWeek.toISOString()
-      );
+      this.setState({ workSessions: allWorkSessions });
     } catch (error) {
       console.error("Error generating schedule:", error);
       let errorMessage = "An error occurred while generating the schedule.";
@@ -230,39 +225,12 @@ class Calendar extends Component {
     }
   }
 
-  filterCurrentWeekWorkSessions(workSessions) {
-    const startOfWeek = this.getStartOfWeek(new Date());
-    const endOfWeek = new Date(startOfWeek);
-    endOfWeek.setDate(endOfWeek.getDate() + 7);
-
+  filterCurrentWeekWorkSessions(workSessions, startTime, endTime) {
     return workSessions.filter(
       (workSession) =>
-        new Date(workSession.start) >= startOfWeek &&
-        new Date(workSession.end) <= endOfWeek
+        new Date(workSession.start) >= new Date(startTime) &&
+        new Date(workSession.end) <= new Date(endTime)
     );
-  }
-
-  async updateCalendarWithTasksAndBlockers(startTime, endTime) {
-    // Update blockers
-    await this.updateCalendar(startTime, endTime);
-
-    // Update work sessions
-    const currentWeekWorkSessions = this.filterCurrentWeekWorkSessions(
-      this.state.workSessions
-    );
-    const calendarWorkSessions = this.transformWorkSessionsToEvents(
-      currentWeekWorkSessions
-    );
-
-    // Combine blockers and work sessions
-    const combinedEvents = [
-      ...this.calendar.events.list,
-      ...calendarWorkSessions,
-    ];
-
-    // Update calendar events
-    this.calendar.events.list = combinedEvents;
-    this.calendar.update();
   }
 
   transformWorkSessionsToEvents(workSessions) {
@@ -315,7 +283,7 @@ class Calendar extends Component {
                 const selectedEndOfWeek = new Date(selectedStartOfWeek);
                 selectedEndOfWeek.setDate(selectedEndOfWeek.getDate() + 7);
 
-                await this.updateCalendarWithTasksAndBlockers(
+                await this.updateCalendar(
                   selectedStartOfWeek.toISOString(),
                   selectedEndOfWeek.toISOString()
                 );
@@ -330,13 +298,7 @@ class Calendar extends Component {
             <Link to="/tasklist">
               <button>Go to Task List</button>
             </Link>
-            <button
-              onClick={() =>
-                this.generateSchedule({
-                  start: { value: this.calendar.startDate },
-                })
-              }
-            >
+            <button onClick={() => this.generateSchedule()}>
               Generate Schedule
             </button>
             <DayPilotCalendar {...this.state} ref={this.calendarRef} />
