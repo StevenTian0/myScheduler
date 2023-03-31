@@ -26,17 +26,12 @@ const styles = {
 class Calendar extends Component {
   constructor(props) {
     super(props);
+    this.calendarRef = React.createRef();
     this.state = {
       isModalOpen: false,
       taskName: "",
       blockers: [],
-    };
-    this.state = {
-      isModalOpen: false,
-      taskName: "",
-    };
-    this.calendarRef = React.createRef();
-    this.state = {
+      workSessions: [],
       viewType: "Week",
       durationBarVisible: false,
       timeRangeSelectedHandling: "Enabled",
@@ -57,7 +52,7 @@ class Calendar extends Component {
             "/api/blocker/addMultiple",
             blockerData
           );
-          console.log(response.data);
+          console.log("multiple blockers: ", response.data);
         } catch (error) {
           console.error("Error adding multiple blockers:", error);
 
@@ -77,10 +72,10 @@ class Calendar extends Component {
         dp.update();
         const selectedStartOfWeek = this.getStartOfWeek(args.start.value);
         const selectedEndOfWeek = new Date(selectedStartOfWeek);
-        console.log("selectedStartOfWeek:", selectedStartOfWeek);
-        console.log("selectedEndOfWeek:", selectedEndOfWeek);
+        //console.log("selectedStartOfWeek:", selectedStartOfWeek);
+        //console.log("selectedEndOfWeek:", selectedEndOfWeek);
         selectedEndOfWeek.setDate(selectedEndOfWeek.getDate() + 7);
-        await this.updateCalendar(
+        await this.updateCalendarWithTasksAndBlockers(
           selectedStartOfWeek.toISOString(),
           selectedEndOfWeek.toISOString()
         );
@@ -99,7 +94,7 @@ class Calendar extends Component {
           const response = await axios.delete(
             `/api/blocker/delete/${token}/${blockerStartTime}`
           );
-          console.log(response.data);
+          console.log("delete response:", response.data);
 
           const dp = this.calendar;
           dp.events.remove(args.e);
@@ -165,7 +160,7 @@ class Calendar extends Component {
     const startOfWeek = this.getStartOfWeek(new Date());
     const endOfWeek = new Date(startOfWeek);
     endOfWeek.setDate(endOfWeek.getDate() + 7);
-    await this.updateCalendar(
+    await this.updateCalendarWithTasksAndBlockers(
       startOfWeek.toISOString(),
       endOfWeek.toISOString()
     );
@@ -179,7 +174,7 @@ class Calendar extends Component {
         `/api/blockers/getBetweenTimes/${token}/${startTime}/${endTime}`
       );
 
-      console.log(response.data);
+      console.log("blocker between time:", response.data);
       const blockers = response.data.blockers.map((blocker) => ({
         start: new Date(blocker.time).getTime(),
         end: new Date(blocker.time).getTime() + blocker.duration * 60000,
@@ -188,7 +183,7 @@ class Calendar extends Component {
 
       this.calendar.events.list = blockers;
       //this.setState({ blockers: blockers }); // Add this line here
-      console.log(blockers);
+      //console.log("blockers: ", blockers);
       this.calendar.update();
     } catch (error) {
       console.error("Error updating calendar:", error);
@@ -202,13 +197,88 @@ class Calendar extends Component {
     }
   }
 
-  // getStartOfWeek(date) {
-  //   const startOfWeek = new Date(date);
-  //   const dayOfWeek = startOfWeek.getDay();
-  //   const diff = startOfWeek.getDate() - dayOfWeek;
-  //   startOfWeek.setDate(diff);
-  //   return startOfWeek;
-  // }
+  async generateSchedule(args) {
+    const token = localStorage.getItem("token");
+    try {
+      const response = await axios.get(`/api/task/getAllWorkSessions/${token}`);
+      const allWorkSessions = response.data;
+      console.log("allWorkSessions: ", allWorkSessions);
+      const currentWeekWorkSessions =
+        this.filterCurrentWeekWorkSessions(allWorkSessions);
+      this.setState({ workSessions: currentWeekWorkSessions });
+      console.log("current: ", currentWeekWorkSessions);
+
+      // Get the start and end of the current week
+      const selectedStartOfWeek = this.getStartOfWeek(args.start.value);
+      const selectedEndOfWeek = new Date(selectedStartOfWeek);
+      //console.log("selectedStartOfWeek:", selectedStartOfWeek);
+      //console.log("selectedEndOfWeek:", selectedEndOfWeek);
+      selectedEndOfWeek.setDate(selectedEndOfWeek.getDate() + 7);
+
+      // Update the calendar with tasks and blockers
+      await this.updateCalendarWithTasksAndBlockers(
+        selectedStartOfWeek.toISOString(),
+        selectedEndOfWeek.toISOString()
+      );
+    } catch (error) {
+      console.error("Error generating schedule:", error);
+      let errorMessage = "An error occurred while generating the schedule.";
+      if (error.response && error.response.data && error.response.data.error) {
+        errorMessage = error.response.data.error;
+      }
+      throw new Error(errorMessage);
+    }
+  }
+
+  filterCurrentWeekWorkSessions(workSessions) {
+    const startOfWeek = this.getStartOfWeek(new Date());
+    const endOfWeek = new Date(startOfWeek);
+    endOfWeek.setDate(endOfWeek.getDate() + 7);
+
+    return workSessions.filter(
+      (workSession) =>
+        new Date(workSession.start) >= startOfWeek &&
+        new Date(workSession.end) <= endOfWeek
+    );
+  }
+
+  async updateCalendarWithTasksAndBlockers(startTime, endTime) {
+    // Update blockers
+    await this.updateCalendar(startTime, endTime);
+
+    // Update work sessions
+    const currentWeekWorkSessions = this.filterCurrentWeekWorkSessions(
+      this.state.workSessions
+    );
+    const calendarWorkSessions = this.transformWorkSessionsToEvents(
+      currentWeekWorkSessions
+    );
+
+    // Combine blockers and work sessions
+    const combinedEvents = [
+      ...this.calendar.events.list,
+      ...calendarWorkSessions,
+    ];
+
+    // Update calendar events
+    this.calendar.events.list = combinedEvents;
+    this.calendar.update();
+  }
+
+  transformWorkSessionsToEvents(workSessions) {
+    return workSessions.map((workSession) => {
+      let startDate = new Date(workSession.start);
+      let endDate = new Date(workSession.end);
+      startDate = new Date(startDate.getTime() - 60000 * 240);
+      endDate = new Date(endDate.getTime() - 60000 * 240);
+
+      return {
+        start: startDate.toISOString(),
+        end: endDate.toISOString(),
+        text: workSession.name,
+      };
+    });
+  }
 
   getStartOfWeek(date) {
     const startOfWeek = new Date(date);
@@ -216,7 +286,7 @@ class Calendar extends Component {
     const diff = startOfWeek.getDate() - (dayOfWeek === 0 ? 0 : dayOfWeek);
     startOfWeek.setDate(diff);
     startOfWeek.setHours(0, 0, 0, 0);
-    console.log("start of week:", startOfWeek);
+    //console.log("start of week:", startOfWeek);
     return startOfWeek;
   }
 
@@ -245,7 +315,7 @@ class Calendar extends Component {
                 const selectedEndOfWeek = new Date(selectedStartOfWeek);
                 selectedEndOfWeek.setDate(selectedEndOfWeek.getDate() + 7);
 
-                await this.updateCalendar(
+                await this.updateCalendarWithTasksAndBlockers(
                   selectedStartOfWeek.toISOString(),
                   selectedEndOfWeek.toISOString()
                 );
@@ -260,6 +330,15 @@ class Calendar extends Component {
             <Link to="/tasklist">
               <button>Go to Task List</button>
             </Link>
+            <button
+              onClick={() =>
+                this.generateSchedule({
+                  start: { value: this.calendar.startDate },
+                })
+              }
+            >
+              Generate Schedule
+            </button>
             <DayPilotCalendar {...this.state} ref={this.calendarRef} />
           </div>
         </div>

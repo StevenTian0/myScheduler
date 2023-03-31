@@ -119,96 +119,115 @@ export const getAllWorkSessions = async (req: Request, res: Response) => {
 		const token = req.params.token
 		let tasks = await getAllTasks(token)
 		let blockers = await getAllBlockers(token)
-		let hourMili = 1000 * 60 * 60;
-		let halfHourMili = 1000 * 60 * 30;
-		let lastTaskTime = 0;
+		let hourMili = 1000 * 60 * 60
+		let halfHourMili = 1000 * 60 * 30
+		let lastTaskTime = 0
 		const sortedAsc = tasks.tasks.sort(
-			(objA, objB) => objA.dueDate - objB.dueDate,
-		);
+			(objA, objB) => objA.dueDate - objB.dueDate
+		)
 
 		const sortedBlocker = blockers.blockers.sort(
-			(objA, objB) => objA.time - objB.time,
-		);
+			(objA, objB) => objA.time - objB.time
+		)
 
-		let today = (new Date()).getTime();
+		let today = new Date().getTime()
 
-		let remainder = today % halfHourMili;
-		today = today - remainder + halfHourMili;
+		let remainder = today % halfHourMili
+		today = today - remainder + halfHourMili
 		//console.log("today :" + new Date())
 		console.log("Today time shifted to the next 30 min: " + today)
 		let blockersPeriods = new Array()
 		let taskAlloted = new Array()
 
-		sortedBlocker.forEach(element => {
-			let temp = [2];
-			temp[0] = element.time.getTime();
-			temp[1] = temp[0] + hourMili * element.duration;
+		sortedBlocker.forEach((element) => {
+			let temp = [2]
+			temp[0] = element.time.getTime()
+			temp[1] = temp[0] + hourMili * element.duration
 			blockersPeriods.push(temp)
-		});
+		})
 
-		blockersPeriods.forEach(element => {
-			let start = new Date(element[0]);
-			let end = new Date(element[1]);
-			console.log("Blocker starts @ " + start.toString() + " ends @ " + end.toString());
-		});
+		blockersPeriods.forEach((element) => {
+			let start = new Date(element[0])
+			let end = new Date(element[1])
+			console.log(
+				"Blocker starts @ " + start.toString() + " ends @ " + end.toString()
+			)
+		})
 
-		sortedAsc.forEach(element => {
-			let temp = [4];
-			temp[0] = element.taskId;
+		sortedAsc.forEach((element) => {
+			let temp = [4]
+			temp[0] = element.taskId
 			temp[1] = element.dueDate.getTime()
-			temp[2] = element.lengthOfWork;
-			temp[3] = 0;
+			temp[2] = element.lengthOfWork
+			temp[3] = 0
 			taskAlloted.push(temp)
-		});
+		})
 
-		taskAlloted.forEach(element => {
-
-			console.log("Task " + element[0] + " due: " + element[1] + " dura: " + element[2] + " ass: " + element[3])
+		taskAlloted.forEach((element) => {
+			console.log(
+				"Task " +
+					element[0] +
+					" due: " +
+					element[1] +
+					" dura: " +
+					element[2] +
+					" ass: " +
+					element[3]
+			)
 			lastTaskTime = element[1]
-		});
+		})
 		//taskid, start time, end time
 		let workPeriods = new Array()
 
-		taskAlloted.forEach(element => {
+		taskAlloted.forEach((element) => {
 			let start = today
 			let end = start
 			while (element[3] < element[2]) {
-				end += halfHourMili;
-				let isSat = true;
+				end += halfHourMili
+				let isSat = true
 				//checking if start, end period is in intereference with any blocker
-				blockersPeriods.forEach(currblock => {
-					if ((start >= currblock[0] && start <= currblock[1]) || (end >= currblock[0] && end <= currblock[1])) {
-						isSat = false;
+				blockersPeriods.forEach((currblock) => {
+					if (
+						(start >= currblock[0] && start <= currblock[1]) ||
+						(end >= currblock[0] && end <= currblock[1])
+					) {
+						isSat = false
 					}
-				});
+				})
 				if (!isSat) {
-					start += halfHourMili;
+					start += halfHourMili
 				} else {
-					let temp = [3];
-					temp[0] = element[0];
-					temp[1] = start;
-					temp[2] = end;
-					element[3] = element[3] + 0.5;
-					workPeriods.push(temp);
-					start += halfHourMili;
+					let temp = [3]
+					temp[0] = element[0]
+					temp[1] = start
+					temp[2] = end
+					element[3] = element[3] + 0.5
+					workPeriods.push(temp)
+					start += halfHourMili
 				}
 			}
-		});
-		console.log("Work periods___");
+		})
+		console.log("Work periods___")
 
 		let converted = new Array()
+		workPeriods.forEach((element) => {
+			const taskId = element[0].toString()
+			const task = tasks.tasks.find((task) => task.taskId === taskId)
 
-		workPeriods.forEach(element => {
-			let temp = new Array();
-			temp[0] = element[0].toString();
-			temp[1] = (new Date(element[1])).toString();
-			temp[2] = (new Date(element[2])).toString();
-			converted.push(temp);
-
-		});
+			if (task) {
+				let temp = {
+					taskId: taskId,
+					start: new Date(element[1]).toString(),
+					end: new Date(element[2]).toString(),
+					task: task.name,
+				}
+				converted.push(temp)
+			} else {
+				console.error(`Task not found for taskId: ${taskId}`)
+			}
+		})
 
 		res.status(200).json(converted)
-
 	} catch (error: any) {
 		res.status(400).json({ error: error.message })
 	}
