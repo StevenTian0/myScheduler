@@ -1,5 +1,6 @@
 import { Request, Response } from "express"
 import { getAllBlockers } from "../services/Blocker.service"
+import { getTotalHoursWorked } from "../services/Day.service"
 import {
 	addTask,
 	updateTask,
@@ -166,13 +167,13 @@ export const getAllWorkSessions = async (req: Request, res: Response) => {
 		taskAlloted.forEach((element) => {
 			console.log(
 				"Task " +
-					element[0] +
-					" due: " +
-					element[1] +
-					" dura: " +
-					element[2] +
-					" ass: " +
-					element[3]
+				element[0] +
+				" due: " +
+				element[1] +
+				" dura: " +
+				element[2] +
+				" ass: " +
+				element[3]
 			)
 			lastTaskTime = element[1]
 		})
@@ -194,6 +195,21 @@ export const getAllWorkSessions = async (req: Request, res: Response) => {
 						isSat = false
 					}
 				})
+				workPeriods.forEach((currblock) => {
+					if (
+						(start >= currblock[0] && start <= currblock[1]) ||
+						(end >= currblock[0] && end <= currblock[1])
+					) {
+						isSat = false
+					}
+				})
+
+				const hours = `0${new Date(start).getHours() - 1}`.slice(-2);
+
+				if (!(parseInt(hours) >= 8 && parseInt(hours) < 17)) {
+					isSat = false
+				}
+
 				if (!isSat) {
 					start += halfHourMili
 				} else {

@@ -23,6 +23,8 @@ const styles = {
   },
 };
 
+
+
 class Calendar extends Component {
   constructor(props) {
     super(props);
@@ -167,6 +169,7 @@ class Calendar extends Component {
     );
   }
 
+
   async updateCalendar(startTime, endTime) {
     const token = localStorage.getItem("token");
 
@@ -181,7 +184,7 @@ class Calendar extends Component {
         end: new Date(blocker.time).getTime() + blocker.duration * 60000,
         backColor: "#808080",
       }));
-
+      //stringToColour(blocker.name)
       const currentWeekWorkSessions = this.filterCurrentWeekWorkSessions(
         this.state.workSessions,
         startTime,
@@ -273,6 +276,15 @@ class Calendar extends Component {
   }
 
   generateColorFromString(str) {
+    var copy = str;
+    for (var i = 0; i < 20; i++) {
+      let length = copy.length
+      for (var a = 0; a < length; a++) {
+        str = str.concat(copy[a])
+      }
+    }
+
+
     let hash = 0;
     for (let i = 0; i < str.length; i++) {
       hash = str.charCodeAt(i) + ((hash << 5) - hash);
