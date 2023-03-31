@@ -209,13 +209,13 @@ class Calendar extends Component {
     }
   }
 
-  // getStartOfWeek(date) {
-  //   const startOfWeek = new Date(date);
-  //   const dayOfWeek = startOfWeek.getDay();
-  //   const diff = startOfWeek.getDate() - dayOfWeek;
-  //   startOfWeek.setDate(diff);
-  //   return startOfWeek;
-  // }
+  getStartOfWeek(date) {
+    const startOfWeek = new Date(date);
+    const dayOfWeek = startOfWeek.getDay();
+    const diff = startOfWeek.getDate() - dayOfWeek;
+    startOfWeek.setDate(diff);
+    return startOfWeek;
+  }
 
 
   exportReport = async () => {
@@ -296,15 +296,6 @@ class Calendar extends Component {
     }
   };
 
-  // importTasks = async () => {
-  //   try {
-  //     const token = localStorage.getItem("token");
-
-  //     const tasks = JSON.parse(
-  //       `{"_id":"6423916fc62d08a2d58548cd","taskId":"21","priority":"0","dueDate":"2025-12-17T08:24:00.000Z","lengthOfWork":5,"workDoneSoFar":0,"name":"New Task","description":"","category":"Unassigned","user":"63fae0b926b0e497994f5a8a","__v"}`
-  //     )
-      
-
   //     // console.log(tasks);
   //     console.log('{"name":"John", "age":30, "city":"New York"}'.json);
 
@@ -335,6 +326,7 @@ class Calendar extends Component {
   componentDidMount() {
     //this.updateCalendar();
     this.getDate();
+  }
 
   getStartOfWeek(date) {
     const startOfWeek = new Date(date);
