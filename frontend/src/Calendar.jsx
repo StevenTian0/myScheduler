@@ -120,9 +120,26 @@ class Calendar extends Component {
 
       eventDeleteHandling: "Update",
       onEventClick: async (args) => {
+        console.log(args.e.data.text);
+        let name = args.e.data.text;
 
-        DayPilot.Modal.alert(args.e.text);
+        const currentWeekWorkSessions = this.filterCurrentWeekWorkSessions(
+          this.state.workSessions,
+          new Date(args.e.data.start),
+          new Date(args.e.data.end)
+        );
 
+        console.log(currentWeekWorkSessions[0]);
+        if (currentWeekWorkSessions.length != 0) {
+          const response = await axios.get(`/api/task/getById/${currentWeekWorkSessions[0].taskId}`);
+          const task = response.data.task;
+          console.log(task);
+          let date = new Date (task.dueDate);
+          console.log(date);
+          DayPilot.Modal.alert("The task \'" + task.name +
+            "\' (Description: " + task.description +
+            ") is due on " + date);
+        }
       },
       onBeforeCellRender: (args) => {
         // console.log("cell");
