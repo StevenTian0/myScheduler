@@ -366,6 +366,7 @@ class Calendar extends Component {
   componentDidMount() {
     //this.updateCalendar();
     this.getDate();
+  }
   async generateSchedule() {
     const token = localStorage.getItem("token");
     try {
