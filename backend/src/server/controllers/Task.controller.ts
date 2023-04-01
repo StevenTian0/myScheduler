@@ -159,7 +159,7 @@ export const getAllWorkSessions = async (req: Request, res: Response) => {
 			let temp = [4]
 			temp[0] = element.taskId
 			temp[1] = element.dueDate.getTime()
-			temp[2] = element.lengthOfWork
+			temp[2] = element.lengthOfWork - element.workDoneSoFar
 			temp[3] = 0
 			taskAlloted.push(temp)
 		})
