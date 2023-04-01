@@ -1,6 +1,22 @@
 import React, { Component } from "react";
 import fetchTasks from "./AddTask";
 import Modal from "react-modal";
+
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Paper,
+  Collapse,
+  IconButton,
+  Button,
+} from "@material-ui/core";
+import { createTheme, ThemeProvider } from '@mui/material/styles';
+import { purple } from '@mui/material/colors';
+
 import {
   DayPilot,
   DayPilotCalendar,
@@ -12,6 +28,19 @@ import axios from "axios";
 import { saveAs } from "file-saver";
 import Timer from "./Timer";
 import {create} from "string-table"
+
+const theme = createTheme({
+  palette: {
+    primary: {
+      // Purple and green play nicely together.
+      main: purple[500],
+    },
+    secondary: {
+      // This is green.A700 as hex.
+      main: '#11cb5f',
+    },
+  },
+});
 
 //import AddBlocker from "./AddBlocker";
 
@@ -30,20 +59,18 @@ const styles = {
   },
 };
 
+
+
 class Calendar extends Component {
   constructor(props) {
     super(props);
+    this.calendarRef = React.createRef();
     this.state = {
+      showGeneratedMessage: false,
       isModalOpen: false,
       taskName: "",
       blockers: [],
-    };
-    this.state = {
-      isModalOpen: false,
-      taskName: "",
-    };
-    this.calendarRef = React.createRef();
-    this.state = {
+      workSessions: [],
       viewType: "Week",
       durationBarVisible: false,
       timeRangeSelectedHandling: "Enabled",
@@ -64,7 +91,7 @@ class Calendar extends Component {
             "/api/blocker/addMultiple",
             blockerData
           );
-          console.log(response.data);
+          //console.log("multiple blockers: ", response.data);
         } catch (error) {
           console.error("Error adding multiple blockers:", error);
 
@@ -84,8 +111,8 @@ class Calendar extends Component {
         dp.update();
         const selectedStartOfWeek = this.getStartOfWeek(args.start.value);
         const selectedEndOfWeek = new Date(selectedStartOfWeek);
-        console.log("selectedStartOfWeek:", selectedStartOfWeek);
-        console.log("selectedEndOfWeek:", selectedEndOfWeek);
+        //console.log("selectedStartOfWeek:", selectedStartOfWeek);
+        //console.log("selectedEndOfWeek:", selectedEndOfWeek);
         selectedEndOfWeek.setDate(selectedEndOfWeek.getDate() + 7);
         await this.updateCalendar(
           selectedStartOfWeek.toISOString(),
@@ -106,7 +133,7 @@ class Calendar extends Component {
           const response = await axios.delete(
             `/api/blocker/delete/${token}/${blockerStartTime}`
           );
-          console.log(response.data);
+          console.log("delete response:", response.data);
 
           const dp = this.calendar;
           dp.events.remove(args.e);
@@ -178,6 +205,7 @@ class Calendar extends Component {
     );
   }
 
+
   async updateCalendar(startTime, endTime) {
     const token = localStorage.getItem("token");
 
@@ -186,16 +214,28 @@ class Calendar extends Component {
         `/api/blockers/getBetweenTimes/${token}/${startTime}/${endTime}`
       );
 
-      console.log(response.data);
+      //console.log("blocker between time:", response.data);
       const blockers = response.data.blockers.map((blocker) => ({
         start: new Date(blocker.time).getTime(),
         end: new Date(blocker.time).getTime() + blocker.duration * 60000,
         backColor: "#808080",
       }));
+      //stringToColour(blocker.name)
+      const currentWeekWorkSessions = this.filterCurrentWeekWorkSessions(
+        this.state.workSessions,
+        startTime,
+        endTime
+      );
+      const calendarWorkSessions = this.transformWorkSessionsToEvents(
+        currentWeekWorkSessions
+      );
+      console.log("calendarWorkSession: ", calendarWorkSessions);
 
-      this.calendar.events.list = blockers;
-      //this.setState({ blockers: blockers }); // Add this line here
-      console.log(blockers);
+      // Combine blockers and work sessions
+      const combinedEvents = [...blockers, ...calendarWorkSessions];
+
+      // Update calendar events
+      this.calendar.events.list = combinedEvents;
       this.calendar.update();
     } catch (error) {
       console.error("Error updating calendar:", error);
@@ -326,6 +366,56 @@ class Calendar extends Component {
   componentDidMount() {
     //this.updateCalendar();
     this.getDate();
+  async generateSchedule() {
+    const token = localStorage.getItem("token");
+    try {
+      const response = await axios.get(`/api/task/getAllWorkSessions/${token}`);
+      const allWorkSessions = response.data;
+      console.log("allWorkSessions: ", allWorkSessions);
+      const earliestStartDate = this.getEarliestDate(allWorkSessions);
+      this.setState({ workSessions: allWorkSessions, earliestStartDate });
+      this.toggleGeneratedMessage();
+    } catch (error) {
+      console.error("Error generating schedule:", error);
+      let errorMessage = "An error occurred while generating the schedule.";
+      if (error.response && error.response.data && error.response.data.error) {
+        errorMessage = error.response.data.error;
+      }
+      throw new Error(errorMessage);
+    }
+  }
+
+  filterCurrentWeekWorkSessions(workSessions, startTime, endTime) {
+    return workSessions.filter(
+      (workSession) =>
+        new Date(workSession.start) >= new Date(startTime) &&
+        new Date(workSession.end) <= new Date(endTime)
+    );
+  }
+
+  transformWorkSessionsToEvents(workSessions) {
+    return workSessions.map((workSession) => {
+      let startDate = new Date(workSession.start);
+      let endDate = new Date(workSession.end);
+      startDate = new Date(startDate.getTime() - 60000 * 240);
+      endDate = new Date(endDate.getTime() - 60000 * 240);
+      const color = this.generateColorFromString(workSession.task);
+      //console.log("work session: ", workSession);
+      return {
+        start: startDate.toISOString(),
+        end: endDate.toISOString(),
+        text: workSession.task,
+        backColor: color, // Add the color property
+      };
+    });
+  }
+
+  toggleGeneratedMessage() {
+    this.setState({ showGeneratedMessage: true }, () => {
+      setTimeout(() => {
+        this.setState({ showGeneratedMessage: false });
+      }, 2000);
+    });
   }
 
   getStartOfWeek(date) {
@@ -334,8 +424,44 @@ class Calendar extends Component {
     const diff = startOfWeek.getDate() - (dayOfWeek === 0 ? 0 : dayOfWeek);
     startOfWeek.setDate(diff);
     startOfWeek.setHours(0, 0, 0, 0);
-    console.log("start of week:", startOfWeek);
+    //console.log("start of week:", startOfWeek);
     return startOfWeek;
+  }
+
+  generateColorFromString(str) {
+    var copy = str;
+    for (var i = 0; i < 20; i++) {
+      let length = copy.length
+      for (var a = 0; a < length; a++) {
+        str = str.concat(copy[a])
+      }
+    }
+
+
+    let hash = 0;
+    for (let i = 0; i < str.length; i++) {
+      hash = str.charCodeAt(i) + ((hash << 5) - hash);
+    }
+    let color = "#";
+    for (let i = 0; i < 3; i++) {
+      const value = (hash >> (i * 8)) & 0xff;
+      color += ("00" + value.toString(16)).substr(-2);
+    }
+    return color;
+  }
+
+  getEarliestDate(workSessions) {
+    let earliestDate = new Date(workSessions[0].start);
+
+    workSessions.forEach((workSession) => {
+      const currentDate = new Date(workSession.start);
+
+      if (currentDate < earliestDate) {
+        earliestDate = currentDate;
+      }
+    });
+
+    return earliestDate;
   }
 
   render() {
@@ -345,10 +471,17 @@ class Calendar extends Component {
       .slice(0, 10);
     return (
       <div style={styles.flex}>
-        <h1>
-          {" "}
-          <center> {this.state.date} </center>
-        </h1>
+        <div class="mom">
+          <div class="child">
+            <img src="https://i.postimg.cc/BnMz9cYk/logo2.png" alt="Logo" width="200" ></img>
+          </div>
+          <div class="child">
+            <h1>
+              {" "}
+              <center> {this.state.date} </center>
+            </h1>
+          </div>
+        </div>
         <div style={styles.wrap}>
           <div style={styles.left}>
             <DayPilotNavigator
@@ -392,13 +525,26 @@ class Calendar extends Component {
             <Timer />
           </div>
           <div style={styles.main}>
-            <Link to="/tasklist">
-              <button>Go to Task List</button>
-            </Link>
+            <ThemeProvider theme={theme}>
+              <Link to="/tasklist">
+                <Button color="primary" variant="outlined">Go to Task List</Button>
+              </Link>
+              &nbsp;
+              <Button color="secondary" variant="outlined" onClick={() => this.generateSchedule()}>
+                Generate Schedule
+              </Button>
+            </ThemeProvider>
+            {this.state.showGeneratedMessage && (
+              <span style={{ marginLeft: "10px", color: "green" }}>
+                Schedule is generated! Start work on{" "}
+                {this.state.earliestStartDate.toLocaleDateString()}
+              </span>
+            )}
+            <div class="space">&nbsp;</div>
             <DayPilotCalendar {...this.state} ref={this.calendarRef} />
           </div>
         </div>
-      </div>
+      </div >
     );
   }
 }

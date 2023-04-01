@@ -1,6 +1,18 @@
 import React, { useState } from "react";
 import Modal from "react-modal";
 import axios from "axios";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Paper,
+  Collapse,
+  IconButton,
+  Button,
+} from "@material-ui/core";
 const customStyles = {
   content: {
     top: "50%",
@@ -72,13 +84,13 @@ function AddTask(props) {
     setPriorityType(e.target.value);
   }
 
-    function handleCategoryTypeChange(e) {
-      setCategoryType(e.target.value);
-    }
+  function handleCategoryTypeChange(e) {
+    setCategoryType(e.target.value);
+  }
 
-   function handleTaskIDChange(e) {
-      setTaskID(e.target.value);
-    }
+  function handleTaskIDChange(e) {
+    setTaskID(e.target.value);
+  }
 
   function handleTaskSelectChange(e) {
     setSelectedTask(e.target.value);
@@ -93,21 +105,21 @@ function AddTask(props) {
   async function handleFormSubmit(e) {
     e.preventDefault();
     const offsetInMilliseconds = 5 * 60 * 60 * 1000; // 5 hours in milliseconds
-//     const adjustedStart = new Date(
-//       new Date(taskStart).getTime() - offsetInMilliseconds
-//     );
-//     const adjustedEnd = new Date(
-//       new Date(taskEnd).getTime() - offsetInMilliseconds
-//     );
-   // const duration = (adjustedEnd.getTime() - adjustedStart.getTime()) / 60000;
+    //     const adjustedStart = new Date(
+    //       new Date(taskStart).getTime() - offsetInMilliseconds
+    //     );
+    //     const adjustedEnd = new Date(
+    //       new Date(taskEnd).getTime() - offsetInMilliseconds
+    //     );
+    // const duration = (adjustedEnd.getTime() - adjustedStart.getTime()) / 60000;
 
-   // let taskId = "";
-//     if (type === "Task") {
-//       let task = tasks.find((task) => task.name === selectedTask);
-//       taskId = task.taskId;
-//     }
+    // let taskId = "";
+    //     if (type === "Task") {
+    //       let task = tasks.find((task) => task.name === selectedTask);
+    //       taskId = task.taskId;
+    //     }
 
-   // const adjustedStartFormatted = adjustedStart.toISOString();
+    // const adjustedStartFormatted = adjustedStart.toISOString();
     // console.log("Type:", type);
     // console.log("TaskId:", taskId);
     // console.log("Duration:", duration);
@@ -145,7 +157,7 @@ function AddTask(props) {
 
   return (
     <>
-      <button onClick={openModal}>Add Task</button>
+      <Button variant="outlined" onClick={openModal}>Add Task</Button>
       <Modal
         isOpen={modalIsOpen}
         onRequestClose={closeModal}
@@ -165,14 +177,14 @@ function AddTask(props) {
           </label>
           <br />
           <label>
-             Task ID:
-             <input
-               type="text"
-               value={taskID}
-               onChange={handleTaskIDChange}
-          />
-          <br>
-          </br>
+            Task ID:
+            <input
+              type="text"
+              value={taskID}
+              onChange={handleTaskIDChange}
+            />
+            <br>
+            </br>
           </label>
           <label>
             Priority:
@@ -188,7 +200,7 @@ function AddTask(props) {
           <br>
           </br>
           <label>
-          Category:
+            Category:
             <select value={categoryType} onChange={handleCategoryTypeChange}>
               <option value="">-- Select Category Type --</option>
               <option value="Unassigned">Unassigned</option>
@@ -198,20 +210,20 @@ function AddTask(props) {
               <option value="Exercises">Exercises</option>
             </select>
           </label>
-                    <br />
-{/*           {type === "Task" && ( */}
-{/*             <label> */}
-{/*               Select Task: */}
-{/*               <select value={selectedTask} onChange={handleTaskSelectChange}> */}
-{/*                 <option value="">-- Select Task --</option> */}
-{/*                 {tasks.map((task) => ( */}
-{/*                   <option key={task.id} value={task.name}> */}
-{/*                     {task.name} */}
-{/*                   </option> */}
-{/*                 ))} */}
-{/*               </select> */}
-{/*             </label> */}
-{/*           )} */}
+          <br />
+          {/*           {type === "Task" && ( */}
+          {/*             <label> */}
+          {/*               Select Task: */}
+          {/*               <select value={selectedTask} onChange={handleTaskSelectChange}> */}
+          {/*                 <option value="">-- Select Task --</option> */}
+          {/*                 {tasks.map((task) => ( */}
+          {/*                   <option key={task.id} value={task.name}> */}
+          {/*                     {task.name} */}
+          {/*                   </option> */}
+          {/*                 ))} */}
+          {/*               </select> */}
+          {/*             </label> */}
+          {/*           )} */}
           <br />
           <br />
           <label>

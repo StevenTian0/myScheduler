@@ -31,7 +31,7 @@ export const addBlocker = async (
 		const newBlocker = new Blocker({
 			time,
 			duration,
-			user: user._id,
+			user: user._id
 		})
 
 		await newBlocker.save()

@@ -163,18 +163,18 @@ export const updateTask = async ({
 		}
 
 		//make sure new values are different from prev
-		if (newDueDate && newDueDate === task.dueDate) {
-			throw new Error("New due date must be different from the old one")
-		}
-		if (newLengthOfWork && newLengthOfWork === task.lengthOfWork) {
-			throw new Error("New length must be different from the old one")
-		}
-		if (newName && newName === task.name) {
-			throw new Error("New name must be different from the old one")
-		}
-		if (newDescription && newDescription === task.description) {
-			throw new Error("New description must be different from the old one")
-		}
+		// if (newDueDate && newDueDate === task.dueDate) {
+		// 	throw new Error("New due date must be different from the old one")
+		// }
+		// if (newLengthOfWork && newLengthOfWork === task.lengthOfWork) {
+		// 	throw new Error("New length must be different from the old one")
+		// }
+		// if (newName && newName === task.name) {
+		// 	throw new Error("New name must be different from the old one")
+		// }
+		// if (newDescription && newDescription === task.description) {
+		// 	throw new Error("New description must be different from the old one")
+		// }
 
 		//updating info
 		if (newDueDate) {

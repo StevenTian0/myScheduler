@@ -11,7 +11,7 @@ import {
 
 export const addBlockerController = async (req: Request, res: Response) => {
 	try {
-		const { token, time, duration, name, description, task } = req.body
+		const { token, time, duration, name, description } = req.body
 		const result = await addBlocker(token, time, duration)
 		res.status(201).json(result)
 	} catch (error: any) {
