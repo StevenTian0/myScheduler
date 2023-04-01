@@ -14,8 +14,8 @@ import {
   IconButton,
   Button,
 } from "@material-ui/core";
-import { createTheme, ThemeProvider } from '@mui/material/styles';
-import { purple } from '@mui/material/colors';
+import { createTheme, ThemeProvider } from "@mui/material/styles";
+import { purple } from "@mui/material/colors";
 
 import {
   DayPilot,
@@ -27,7 +27,7 @@ import { Link } from "react-router-dom";
 import axios from "axios";
 import { saveAs } from "file-saver";
 import Timer from "./Timer";
-import {create} from "string-table"
+import { create } from "string-table";
 
 const theme = createTheme({
   palette: {
@@ -37,7 +37,7 @@ const theme = createTheme({
     },
     secondary: {
       // This is green.A700 as hex.
-      main: '#11cb5f',
+      main: "#11cb5f",
     },
   },
 });
@@ -58,8 +58,6 @@ const styles = {
     padding: 20,
   },
 };
-
-
 
 class Calendar extends Component {
   constructor(props) {
@@ -193,6 +191,35 @@ class Calendar extends Component {
     });
   }
 
+  onEventDelete = async (args) => {
+    if (!window.confirm("Are you sure you want to delete this blocker?")) {
+      return;
+    }
+
+    const blockerStartTime = args.e.start().toString();
+
+    try {
+      const token = localStorage.getItem("token");
+      const response = await axios.delete(
+        `/api/blocker/delete/${token}/${blockerStartTime}`
+      );
+      console.log("delete response:", response.data);
+
+      const dp = this.calendar;
+      dp.events.remove(args.e);
+      dp.update();
+    } catch (error) {
+      console.error("Error deleting blocker:", error);
+
+      let errorMessage = "An error occurred while deleting the blocker.";
+      if (error.response && error.response.data && error.response.data.error) {
+        errorMessage = error.response.data.error;
+      }
+
+      alert(errorMessage);
+    }
+  };
+
   async componentDidMount() {
     //this.updateCalendar();
     this.getDate();
@@ -204,7 +231,6 @@ class Calendar extends Component {
       endOfWeek.toISOString()
     );
   }
-
 
   async updateCalendar(startTime, endTime) {
     const token = localStorage.getItem("token");
@@ -257,13 +283,18 @@ class Calendar extends Component {
     return startOfWeek;
   }
 
+  onBeforeEventRender(args) {
+    console.log("button removed");
+    args.data.backColor = args.data.backColor || "#f9f9f9";
+    args.data.deleteMargin = -1000; // Set a large negative value to move the delete button out of view
+  }
 
   exportReport = async () => {
     try {
       const token = localStorage.getItem("token");
       const response = await axios.get(`/api/blockers/getAll/${token}`);
       const blockers = response.data.blockers;
-      var tasks = []
+      var tasks = [];
       var report = "Productivity Report\n\n";
 
       //TODO: after merging with final task model, remove blockers and format
@@ -272,7 +303,7 @@ class Calendar extends Component {
       // blockers.forEach(function (blocker) {
       //   if (hero.hasOwnProperty('task')) {
       //     const displayTask = {
-            
+
       //     };
 
       //   }
@@ -295,26 +326,23 @@ class Calendar extends Component {
       const token = localStorage.getItem("token");
       const response = await axios.get(`/api/blockers/getAll/${token}`);
       const blockers = response.data.blockers;
-      const todayTask =[];
+      const todayTask = [];
       var report = "Daily Log\n\n";
-      const today = new Date()
+      const today = new Date();
 
       blockers.forEach((b) => {
-
-        if ((today.toISOString().substring(0,10) === b.time.substring(0,10))) {
+        if (today.toISOString().substring(0, 10) === b.time.substring(0, 10)) {
           todayTask.push(b);
         }
-
       });
 
       if (todayTask.length == 0) {
-        report += "nothing planned for today"
-      }
-      else {
-        report += create(todayTask)
+        report += "nothing planned for today";
+      } else {
+        report += create(todayTask);
       }
 
-      var blob = new Blob([report], {type: "text/plain;charset=utf-8"});
+      var blob = new Blob([report], { type: "text/plain;charset=utf-8" });
       saveAs(blob, "Daily Log.txt");
     } catch (error) {
       console.error(error);
@@ -340,8 +368,8 @@ class Calendar extends Component {
   //     console.log('{"name":"John", "age":30, "city":"New York"}'.json);
 
   //     const taskId = "";
-	// 		const dueDate = "";
-	// 		const lengthOfWork = "";
+  // 		const dueDate = "";
+  // 		const lengthOfWork = "";
   //     const priorityValue = "";
   //     const categoryValue = "";
   //     const name = "";
@@ -349,15 +377,15 @@ class Calendar extends Component {
 
   //     const response = await axios.post("/api/blockers/add", {
   //       taskId,
-	// 		  dueDate,
-	// 		  lengthOfWork,
-	// 		  priorityValue,
-	// 		  token,
-	// 		  categoryValue,
-	// 		  name,
-	// 		  description,
+  // 		  dueDate,
+  // 		  lengthOfWork,
+  // 		  priorityValue,
+  // 		  token,
+  // 		  categoryValue,
+  // 		  name,
+  // 		  description,
   //     });
-      
+
   //   } catch (error) {
   //     console.error(error);
   //   }
@@ -432,12 +460,11 @@ class Calendar extends Component {
   generateColorFromString(str) {
     var copy = str;
     for (var i = 0; i < 20; i++) {
-      let length = copy.length
+      let length = copy.length;
       for (var a = 0; a < length; a++) {
-        str = str.concat(copy[a])
+        str = str.concat(copy[a]);
       }
     }
-
 
     let hash = 0;
     for (let i = 0; i < str.length; i++) {
@@ -474,7 +501,11 @@ class Calendar extends Component {
       <div style={styles.flex}>
         <div class="mom">
           <div class="child">
-            <img src="https://i.postimg.cc/BnMz9cYk/logo2.png" alt="Logo" width="200" ></img>
+            <img
+              src="https://i.postimg.cc/BnMz9cYk/logo2.png"
+              alt="Logo"
+              width="200"
+            ></img>
           </div>
           <div class="child">
             <h1>
@@ -528,10 +559,16 @@ class Calendar extends Component {
           <div style={styles.main}>
             <ThemeProvider theme={theme}>
               <Link to="/tasklist">
-                <Button color="primary" variant="outlined">Go to Task List</Button>
+                <Button color="primary" variant="outlined">
+                  Go to Task List
+                </Button>
               </Link>
               &nbsp;
-              <Button color="secondary" variant="outlined" onClick={() => this.generateSchedule()}>
+              <Button
+                color="secondary"
+                variant="outlined"
+                onClick={() => this.generateSchedule()}
+              >
                 Generate Schedule
               </Button>
             </ThemeProvider>
@@ -542,10 +579,15 @@ class Calendar extends Component {
               </span>
             )}
             <div class="space">&nbsp;</div>
-            <DayPilotCalendar {...this.state} ref={this.calendarRef} />
+            <DayPilotCalendar
+              {...this.state}
+              ref={this.calendarRef}
+              onBeforeEventRender={this.onBeforeEventRender}
+              onEventDelete={this.onEventDelete}
+            />
           </div>
         </div>
-      </div >
+      </div>
     );
   }
 }
