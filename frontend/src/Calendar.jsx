@@ -1,4 +1,5 @@
 import React, { Component } from "react";
+import fetchTasks from "./AddTask";
 import Modal from "react-modal";
 
 import {
@@ -24,6 +25,9 @@ import {
 import { Link } from "react-router-dom";
 
 import axios from "axios";
+import { saveAs } from "file-saver";
+import Timer from "./Timer";
+import {create} from "string-table"
 
 const theme = createTheme({
   palette: {
@@ -49,6 +53,9 @@ const styles = {
   },
   main: {
     flexGrow: "1",
+  },
+  pad: {
+    padding: 20,
   },
 };
 
@@ -242,6 +249,123 @@ class Calendar extends Component {
     }
   }
 
+  getStartOfWeek(date) {
+    const startOfWeek = new Date(date);
+    const dayOfWeek = startOfWeek.getDay();
+    const diff = startOfWeek.getDate() - dayOfWeek;
+    startOfWeek.setDate(diff);
+    return startOfWeek;
+  }
+
+
+  exportReport = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      const response = await axios.get(`/api/blockers/getAll/${token}`);
+      const blockers = response.data.blockers;
+      var tasks = []
+      var report = "Productivity Report\n\n";
+
+      //TODO: after merging with final task model, remove blockers and format
+      //(remove ids, __V, user info...)
+
+      // blockers.forEach(function (blocker) {
+      //   if (hero.hasOwnProperty('task')) {
+      //     const displayTask = {
+            
+      //     };
+
+      //   }
+      // });
+
+      // report += create(tasks);
+      report += create(blockers);
+
+      var blob = new Blob([report], {
+        type: "text/plain;charset=utf-8",
+      });
+      saveAs(blob, "productivity report.txt");
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  exportDay = async (date) => {
+    try {
+      const token = localStorage.getItem("token");
+      const response = await axios.get(`/api/blockers/getAll/${token}`);
+      const blockers = response.data.blockers;
+      const todayTask =[];
+      var report = "Daily Log\n\n";
+      const today = new Date()
+
+      blockers.forEach((b) => {
+
+        if ((today.toISOString().substring(0,10) === b.time.substring(0,10))) {
+          todayTask.push(b);
+        }
+
+      });
+
+      if (todayTask.length == 0) {
+        report += "nothing planned for today"
+      }
+      else {
+        report += create(todayTask)
+      }
+
+      var blob = new Blob([report], {type: "text/plain;charset=utf-8"});
+      saveAs(blob, "Daily Log.txt");
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  exportTasks = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      const response = await axios.get(`/api/task/getAll/${token}`);
+
+      console.log(JSON.stringify(response.data.tasks));
+      var blob = new Blob([JSON.stringify(response.data.tasks)], {
+        type: "text/plain;charset=utf-8",
+      });
+      saveAs(blob, "tasks.txt");
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  //     // console.log(tasks);
+  //     console.log('{"name":"John", "age":30, "city":"New York"}'.json);
+
+  //     const taskId = "";
+	// 		const dueDate = "";
+	// 		const lengthOfWork = "";
+  //     const priorityValue = "";
+  //     const categoryValue = "";
+  //     const name = "";
+  //     const description = "";
+
+  //     const response = await axios.post("/api/blockers/add", {
+  //       taskId,
+	// 		  dueDate,
+	// 		  lengthOfWork,
+	// 		  priorityValue,
+	// 		  token,
+	// 		  categoryValue,
+	// 		  name,
+	// 		  description,
+  //     });
+      
+  //   } catch (error) {
+  //     console.error(error);
+  //   }
+  // };
+
+  componentDidMount() {
+    //this.updateCalendar();
+    this.getDate();
   async generateSchedule() {
     const token = localStorage.getItem("token");
     try {
@@ -382,6 +506,23 @@ class Calendar extends Component {
                 });
               }}
             />
+            <div style={styles.pad}>
+              <center>
+                <button type="button" onClick={this.exportTasks}>
+                  Export Tasks
+                </button>
+                <button type="button" onClick={this.exportReport}>
+                  Get Productivity Report
+                </button>
+                <button type="button" onClick={this.exportDay}>
+                  Daily Log
+                </button>
+                {/* <button type="button" onClick={this.importTasks}>
+                  Import Tasks
+                </button> */}
+              </center>
+            </div>
+            <Timer />
           </div>
           <div style={styles.main}>
             <ThemeProvider theme={theme}>
