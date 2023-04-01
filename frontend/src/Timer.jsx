@@ -2,6 +2,33 @@
 
 import React from 'react';
 import ReactDOM from 'react-dom';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Paper,
+  Collapse,
+  IconButton,
+  Button,
+} from "@material-ui/core";
+import { createTheme, ThemeProvider } from "@mui/material/styles";
+import { purple } from "@mui/material/colors";
+
+const theme = createTheme({
+  palette: {
+    primary: {
+      // Purple and green play nicely together.
+      main: purple[500],
+    },
+    secondary: {
+      // This is green.A700 as hex.
+      main: "#11cb5f",
+    },
+  },
+});
 
 class Timer extends React.Component {
   constructor(props) {
@@ -62,17 +89,20 @@ class Timer extends React.Component {
     return (
       <div>
         <center>
-        <div>
-          {this.formatTime(this.state.currentTimeMin)}:
-          {this.formatTime(this.state.currentTimeSec)}
-        </div>
-        {this.state.running === false && (
-          <button onClick={this.start}>START</button>
-        )}
-        {this.state.running === true && (
-          <button onClick={this.stop}>STOP</button>
-        )}
-        <button onClick={this.reset}>RESET</button>
+          <p> <b> Timer:</b></p>
+          <div>
+            {this.formatTime(this.state.currentTimeMin)}:
+            {this.formatTime(this.state.currentTimeSec)}
+          </div>
+
+          <div class="note"></div>
+          {this.state.running === false && (
+            <Button color="primary" variant="outlined" onClick={this.start}>START</Button>
+          )}
+          {this.state.running === true && (
+            <Button color="primary" variant="outlined" onClick={this.stop}>STOP</Button>
+          )}
+          <Button color="secondary" variant="outlined" onClick={this.reset}>RESET</Button>
         </center>
       </div>
     );

@@ -134,7 +134,7 @@ class Calendar extends Component {
           const response = await axios.get(`/api/task/getById/${currentWeekWorkSessions[0].taskId}`);
           const task = response.data.task;
           console.log(task);
-          let date = new Date (task.dueDate);
+          let date = new Date(task.dueDate);
           console.log(date);
           DayPilot.Modal.alert("The task \'" + task.name +
             "\' (Description: " + task.description +
@@ -530,15 +530,18 @@ class Calendar extends Component {
             />
             <div style={styles.pad}>
               <center>
-                <button type="button" onClick={this.exportTasks}>
+                <Button color="primary" variant="outlined" onClick={this.exportTasks}>
                   Export Tasks
-                </button>
-                <button type="button" onClick={this.exportReport}>
+                </Button>
+                <div class="note"></div>
+                <Button color="primary" variant="outlined" onClick={this.exportReport}>
                   Get Productivity Report
-                </button>
-                <button type="button" onClick={this.exportDay}>
+                </Button>
+                <div class="note"></div>
+                <Button color="primary" variant="outlined" onClick={this.exportDay}>
                   Daily Log
-                </button>
+                </Button>
+                <div class="note"></div>
                 {/* <button type="button" onClick={this.importTasks}>
                   Import Tasks
                 </button> */}
@@ -576,8 +579,8 @@ class Calendar extends Component {
               onEventDelete={this.onEventDelete}
             />
           </div>
-        </div>
-      </div>
+        </div >
+      </div >
     );
   }
 }
