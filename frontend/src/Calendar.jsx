@@ -120,36 +120,9 @@ class Calendar extends Component {
 
       eventDeleteHandling: "Update",
       onEventClick: async (args) => {
-        if (!window.confirm("Are you sure you want to delete this blocker?")) {
-          return;
-        }
 
-        const blockerStartTime = args.e.start().toString();
+        DayPilot.Modal.alert(args.e.text);
 
-        try {
-          const token = localStorage.getItem("token");
-          const response = await axios.delete(
-            `/api/blocker/delete/${token}/${blockerStartTime}`
-          );
-          console.log("delete response:", response.data);
-
-          const dp = this.calendar;
-          dp.events.remove(args.e);
-          dp.update();
-        } catch (error) {
-          console.error("Error deleting blocker:", error);
-
-          let errorMessage = "An error occurred while deleting the blocker.";
-          if (
-            error.response &&
-            error.response.data &&
-            error.response.data.error
-          ) {
-            errorMessage = error.response.data.error;
-          }
-
-          alert(errorMessage);
-        }
       },
       onBeforeCellRender: (args) => {
         // console.log("cell");
