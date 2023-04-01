@@ -1,5 +1,17 @@
 import Modal from "react-modal";
 import axios from "axios";
+import {
+    Table,
+    TableBody,
+    TableCell,
+    TableContainer,
+    TableHead,
+    TableRow,
+    Paper,
+    Collapse,
+    IconButton,
+    Button,
+} from "@material-ui/core";
 import React, { useState, useEffect } from "react";
 
 const customStyles = {
@@ -12,6 +24,8 @@ const customStyles = {
         transform: "translate(-50%, -50%)"
     }
 };
+
+
 
 Modal.setAppElement("#root");
 
@@ -116,7 +130,8 @@ function UpdateTask(props) {
 
     return (
         <>
-            <button onClick={openModal}>Update Task</button>
+            <Button variant="contained" color="blue" onClick={openModal}>Update Task</Button>
+            &nbsp;
             <Modal
                 isOpen={modalIsOpen}
                 onRequestClose={closeModal}

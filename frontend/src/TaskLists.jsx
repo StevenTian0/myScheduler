@@ -17,7 +17,21 @@ import { KeyboardArrowDown, KeyboardArrowUp } from "@material-ui/icons";
 import { Link } from "react-router-dom";
 import AddTask from "./AddTask";
 import UpdateTask from "./UpdateTask";
+import { createTheme, ThemeProvider } from '@mui/material/styles';
+import { purple } from '@mui/material/colors';
 
+const theme = createTheme({
+  palette: {
+    primary: {
+      // Purple and green play nicely together.
+      main: purple[500],
+    },
+    secondary: {
+      // This is green.A700 as hex.
+      main: '#11cb5f',
+    },
+  },
+});
 const TaskList = () => {
   const [tasks, setTasks] = useState(null);
   const [selectedTask, setSelectedTask] = useState(null);
@@ -74,7 +88,7 @@ const TaskList = () => {
     } catch (error) {
       console.error(error);
     }
-    };
+  };
 
 
   const handleAddTask = async (newTask) => {
@@ -82,14 +96,14 @@ const TaskList = () => {
 
     const token = localStorage.getItem("token");
 
-//     console.log("Token:", token);
-//     console.log("Due Date", dueDate);
-//     console.log("Length Of Work:", lengthOfWork);
-//     console.log("name:", name);
-//     console.log("description:", description);
-//     console.log("Priority:", priority);
-//     console.log("Category:", category);
-//     console.log("taskId:", taskid);
+    //     console.log("Token:", token);
+    //     console.log("Due Date", dueDate);
+    //     console.log("Length Of Work:", lengthOfWork);
+    //     console.log("name:", name);
+    //     console.log("description:", description);
+    //     console.log("Priority:", priority);
+    //     console.log("Category:", category);
+    //     console.log("taskId:", taskid);
     // Prepare the data to send to the backend
     const taskData = {
       token,
@@ -155,13 +169,13 @@ const TaskList = () => {
 
       throw new Error(errorMessage);
     }
-  };  
+  };
 
   const renderTaskRow = (task) => {
     const isExpanded = task === selectedTask;
     const handleSubmit = (updatedTask) => {
-        updatedTask.taskId = task.taskId;
-        handleUpdateTask(updatedTask);
+      updatedTask.taskId = task.taskId;
+      handleUpdateTask(updatedTask);
     };
     return (
       <React.Fragment key={task.taskId}>
@@ -175,7 +189,7 @@ const TaskList = () => {
           <TableCell align="right">{task.dueDate}</TableCell>
           <TableCell align="right">{task.priority}</TableCell>
           <TableCell align="right">
-          <UpdateTask onSubmit={handleSubmit} />
+            <UpdateTask onSubmit={handleSubmit} />
             <Button
               variant="contained"
               color="secondary"
@@ -203,11 +217,14 @@ const TaskList = () => {
 
   return (
     <div>
-      <button onClick={loadTasks}>Load Tasks</button>
-      <button onClick={handleDeleteAllTasks}>Delete All Tasks</button>
+      <Button variant="outlined" color="primary" onClick={loadTasks}>Load Tasks</Button>
+      &nbsp;
+      <Button variant="outlined" onClick={handleDeleteAllTasks}>Delete All Tasks</Button>
+      &nbsp;
       <Link to="/calendar">
-        <button>Go to Calendar</button>
+        <Button variant="outlined" color="primary" >Go to Calendar</Button>
       </Link>
+      &nbsp;
       <AddTask onSubmit={handleAddTask} />
       <TableContainer component={Paper}>
         <Table>

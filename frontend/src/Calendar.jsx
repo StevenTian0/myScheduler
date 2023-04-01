@@ -1,5 +1,21 @@
 import React, { Component } from "react";
 import Modal from "react-modal";
+
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Paper,
+  Collapse,
+  IconButton,
+  Button,
+} from "@material-ui/core";
+import { createTheme, ThemeProvider } from '@mui/material/styles';
+import { purple } from '@mui/material/colors';
+
 import {
   DayPilot,
   DayPilotCalendar,
@@ -8,6 +24,19 @@ import {
 import { Link } from "react-router-dom";
 
 import axios from "axios";
+
+const theme = createTheme({
+  palette: {
+    primary: {
+      // Purple and green play nicely together.
+      main: purple[500],
+    },
+    secondary: {
+      // This is green.A700 as hex.
+      main: '#11cb5f',
+    },
+  },
+});
 
 //import AddBlocker from "./AddBlocker";
 
@@ -318,10 +347,17 @@ class Calendar extends Component {
       .slice(0, 10);
     return (
       <div style={styles.flex}>
-        <h1>
-          {" "}
-          <center> {this.state.date} </center>
-        </h1>
+        <div class="mom">
+          <div class="child">
+            <img src="https://i.postimg.cc/BnMz9cYk/logo2.png" alt="Logo" width="200" ></img>
+          </div>
+          <div class="child">
+            <h1>
+              {" "}
+              <center> {this.state.date} </center>
+            </h1>
+          </div>
+        </div>
         <div style={styles.wrap}>
           <div style={styles.left}>
             <DayPilotNavigator
@@ -348,23 +384,26 @@ class Calendar extends Component {
             />
           </div>
           <div style={styles.main}>
-            <Link to="/tasklist">
-              <button>Go to Task List</button>
-            </Link>
-            <button onClick={() => this.generateSchedule()}>
-              Generate Schedule
-            </button>
+            <ThemeProvider theme={theme}>
+              <Link to="/tasklist">
+                <Button color="primary" variant="outlined">Go to Task List</Button>
+              </Link>
+              &nbsp;
+              <Button color="secondary" variant="outlined" onClick={() => this.generateSchedule()}>
+                Generate Schedule
+              </Button>
+            </ThemeProvider>
             {this.state.showGeneratedMessage && (
               <span style={{ marginLeft: "10px", color: "green" }}>
                 Schedule is generated! Start work on{" "}
                 {this.state.earliestStartDate.toLocaleDateString()}
               </span>
             )}
-
+            <div class="space">&nbsp;</div>
             <DayPilotCalendar {...this.state} ref={this.calendarRef} />
           </div>
         </div>
-      </div>
+      </div >
     );
   }
 }
